@@ -3,6 +3,10 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import PageHeader from '../page-header/PageHeader';
 import Navbar from '../navbar/Navbar';
+import CurrentPrice from '../current-price/CurrentPrice'
+import Timeseries from '../timeseries/Timeseries'
+import ValueCache from '../value-cache/ValueCache'
+import Volatility from '../volatility/Volatility'
 
 function App() {
   return(
@@ -13,17 +17,20 @@ function App() {
           <Router>
             <Navbar/>
             <Switch>  
-                <Route path="/page2">  
-                    <div className='my-page-content'>Running Average Timeseries</div>  
+                <Route path="/current-price">  
+                    <div className='my-page-content'><CurrentPrice/></div>  
+                </Route>
+                <Route path="/timeseries">  
+                    <div className='my-page-content'><Timeseries/></div>  
                 </Route>  
-                <Route path="/page3">  
-                    <div className='my-page-content'>Last Value Data Cache</div>  
+                <Route path="/value-cache">  
+                    <div className='my-page-content'><ValueCache/></div>  
                 </Route>  
-                <Route path="/page4">  
-                    <div className='my-page-content'>Sym Volatility</div>  
+                <Route path="/volatility">  
+                    <div className='my-page-content'><Volatility/></div>  
                 </Route>  
                 <Route path="/">  
-                    <div className='my-page-content'>Current Prices</div>  
+                    <div className='my-page-content'><CurrentPrice/></div>  
                 </Route>  
             </Switch>  
           </Router>
