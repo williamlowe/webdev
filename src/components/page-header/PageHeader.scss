@@ -1,0 +1,16 @@
+@import '../../variables.scss'; 
+
+.page-header {  
+    margin: 0;  
+    background: $primary;
+    height: $page-header-height; 
+    width: 100%;  
+    display: flex;  
+    align-items: center;  
+
+    .title {  
+        margin: 0;  
+        color: #ffffff;  
+        margin-left: 20px;  
+    }  
+} 
