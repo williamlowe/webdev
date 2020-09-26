@@ -1,3 +1,11 @@
+@import './components/app/App.scss'; 
+@import './components/page-header/PageHeader.scss'; 
+@import './components/navbar/Navbar.scss'; 
+@import './components/current-price/CurrentPrice.scss'; 
+@import './components/timeseries/Timeseries.scss';
+@import './components/value-cache/ValueCache.scss';
+@import './components/volatility/Volatility.scss';   
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
