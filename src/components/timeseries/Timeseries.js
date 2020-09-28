@@ -93,17 +93,29 @@ export default class Timeseries extends React.Component {
     render() {  
         //Slider component set for the number of possible 15-minute increments, to be updated when query for qRest is known
         
+        let today = new Date();
+        let hh = today.getUTCHours();
+        let mm = today.getUTCMinutes();
+
+        let vals = [];
+
+        for(let i=0; i<Math.ceil((hh*60+mm)/15)+1; i++){
+            vals[i] = {
+                value: i
+            };
+        }
+
         return (  
             <div>
                 <p>Timeseries Graph and Slider for {this.state.currentDate}D{this.state.currentTime}</p>
                 <br/><br/>
                 <Slider
-                    defaultValue={[this.state.rangeShort, this.state.rangeLong]}
+                    defaultValue={[0, Math.ceil((hh*60+mm)/15)]}
                     onChangeCommitted={this.updateRange}
                     valueLabelDisplay="on"
                     valueLabelFormat={this.getLabel}
-                    min={0}
-                    max={96}
+                    marks={vals}
+                    step={null}
                 />
                 {this.state.sliderVal}
             </div>  
