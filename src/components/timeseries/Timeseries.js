@@ -1,5 +1,6 @@
 import * as React from 'react';  
 import { Slider } from '@material-ui/core';
+import axios from 'axios';
 
 export default class Timeseries extends React.Component {
     constructor(props) {  
@@ -82,12 +83,46 @@ export default class Timeseries extends React.Component {
         return this.state.sliderLabels[index];
     }
 
-    componentDidMount() { 
+    async componentDidMount() { 
         //Async/Await Query to qRest here
         //Then put results in state's graphData
+
+        var url="https://81.150.99.19:8035/executeQuery";
+
+      
+        let queryRequest= {
+            "query": "(select distinct sym from trade)",
+            "type": "sync",
+            "response": true
+        };
+
+        let response = await axios.post(url, queryRequest, {
+            headers: {
+                "Accept": "*/*",
+                "Authorization": "BASIC dXNlcjpwYXNz"
+            },
+            auth: {
+                username: 'user',
+                password: 'pass'
+            }
+        });
+
+        console.log(response);
+
+
+        function myFunction(item, index, arr) {
+            arr[index] = item.sym;
+        }
+        
+        let res = response.data.result;
+        res.forEach(myFunction);
+
+        alert(res);
+        
+
         window.setInterval(function () {
             this.updateDateTime();
-          }.bind(this), 10000);
+          }.bind(this), 1000);
     } 
 
     render() {  
