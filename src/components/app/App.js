@@ -12,7 +12,6 @@ function App() {
   return(
     <div className="App">
       <header className="App-header">
-        <p>
           <PageHeader/>
           <Router>
             <Navbar/>
@@ -34,7 +33,6 @@ function App() {
                 </Route>  
             </Switch>  
           </Router>
-        </p>
       </header>
     </div>
   )
