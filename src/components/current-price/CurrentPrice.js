@@ -24,7 +24,7 @@ export default class App extends Component {
 
   
     let queryRequest= {
-        "query": "(select last price, max price, min price by sym from trade)",
+        "query": "(select last price, max price, min price by sym from trade where time.date = .z.d)",
         "type": "sync",
         "response": true
     };
@@ -73,7 +73,7 @@ export default class App extends Component {
     minprice:e.value3})
   }
 
-  componentDidMount(){
+  async componentDidMount(){
     this.getOptions()
   }
   
