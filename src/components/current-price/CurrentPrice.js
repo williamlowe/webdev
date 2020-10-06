@@ -3,7 +3,7 @@ import Select from 'react-select'
 import axios from 'axios'
 
 
-export default class App extends Component {
+export default class CurrentPrice2 extends React.Component {
 
   constructor(props){
     super(props)

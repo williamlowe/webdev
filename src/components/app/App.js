@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import PageHeader from '../page-header/PageHeader';
 import Navbar from '../navbar/Navbar';
-import CurrentPrice from '../current-price/CurrentPrice'
+import CurrentPrice from '../current-price/CurrentPrice2'
 import Timeseries from '../timeseries/Timeseries'
 import ValueCache from '../value-cache/ValueCache'
 import Volatility from '../volatility/Volatility'
@@ -12,7 +12,6 @@ function App() {
   return(
     <div className="App">
       <header className="App-header">
-        <p>
           <PageHeader/>
           <Router>
             <Navbar/>
@@ -34,7 +33,6 @@ function App() {
                 </Route>  
             </Switch>  
           </Router>
-        </p>
       </header>
     </div>
   )
