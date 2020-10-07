@@ -1,6 +1,6 @@
 import * as React from 'react';  
 import PropTypes from 'prop-types';
-import {Typography, IconButton, Box, Collapse, Select, MenuItem, InputLabel, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import {Typography, IconButton, Box, Collapse, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import axios from 'axios';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
@@ -10,84 +10,86 @@ export default class CurrentPrice extends React.Component {
 
   constructor(props){
     super(props)
+    let dummyData=[
+      { date: '2020-10-04', closePrice: 0, oldMaxPrice: 0, oldMinPrice: 0 },
+      { date: '2020-10-03', closePrice: 0, oldMaxPrice: 0, oldMinPrice: 0 },
+      { date: '2020-10-02', closePrice: 0, oldMaxPrice: 0, oldMinPrice: 0 }
+    ];
     this.state = {
       days: 0,
-      graphData: {},
 
       //TableData
-      currentPrices: [],
-      maxSym: {
-        sym: "",
-        price: 0
-      },
-      minSym: {
-        sym: "",
-        price: 0
-      },
+      currentPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      maxPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      minPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       highSym: {
-        sym: "",
+        sym: "IBM",
         volume: 0
-      }
+      },
+      history: [dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData]
+      
     }
     this.handleChange = this.handleChange.bind(this);
   }
 
-  
-
-  async updateData(){
-    
-    let newTableData = await this.getTableData();
-    console.log(newTableData);
-
-    //Extracts the Current Prices, Max, Min, and Highest Traded from Tabledata
-    let newPrices = [];
-    let newMax = 0, newMaxInd = 0;
-    let newMin = 10000, newMinInd = 0;
-    let newHigh = 0, newHighInd = 0;
-    for(let i=0; i<10; i++){
-      newPrices.push(newTableData[i].lastp);
-      if(newTableData[i].maxp >= newMax){
-        newMax = newTableData[i].maxp;
-        newMaxInd = i;
-      }
-      if(newTableData[i].minp <= newMin){
-        newMin = newTableData[i].minp;
-        newMinInd = i;
-      }
-      if(newTableData[i].vol >= newHigh){
-        newHigh = newTableData[i].vol;
-        newHighInd = i;
-      }
-    }
-    //Creates Objects for state
-    let newMaxSym = {
-      sym: newTableData[newMaxInd].sym,
-      price: newTableData[newMaxInd].maxp
-    };
-    let newMinSym = {
-      sym: newTableData[newMinInd].sym,
-      price: newTableData[newMinInd].minp
-    };
-    let newHighSym = {
-      sym: newTableData[newHighInd].sym,
-      volume: newTableData[newHighInd].vol
-    };
-
-    this.setState({
-      currentPrices: newPrices,
-      maxSym: newMaxSym,
-      minSym: newMinSym,
-      highSym: newHighSym});
-
-  }
-
-  async getTableData() { 
+  async getCurrentData() { 
 
     var url="https://81.150.99.19:8035/executeQuery";
 
   
     let queryRequest= {
-        "query": "(select lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price], vol:sum size by sym, time.date from trade where time.date within (.z.d-2;.z.d))",
+        "query": "(select lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price], vol:sum size by sym, time.date from trade where time.date =.z.d)",
+        "type": "sync",
+        "response": true
+    };
+
+    let response = await axios.post(url, queryRequest, {
+        headers: {
+            "Accept": "*/*",
+            "Authorization": "BASIC dXNlcjpwYXNz"
+        },
+        auth: {
+            username: 'user',
+            password: 'pass'
+        }
+    });
+
+    let newTableData = response.data.result;
+
+    //Extracts the Current Prices, Max, Min, and Highest Traded from Tabledata
+    let newPrices=[], newMaxPrices=[], newMinPrices=[];
+    
+    let newHigh = 0, newHighInd = 0;
+    for(let i=0; i<10; i++){
+      newPrices.push(newTableData[i].lastp);
+      newMaxPrices.push(newTableData[i].maxp);
+      newMinPrices.push(newTableData[i].minp);
+      
+      if(newTableData[i].vol >= newHigh){
+        newHigh = newTableData[i].vol;
+        newHighInd = i;
+      }
+    }
+    
+    let newHighSym = {
+      sym: newTableData[newHighInd].sym,
+      volume: newTableData[newHighInd].vol
+    };
+
+    return({
+      currentPrices: newPrices,
+      maxPrices: newMaxPrices,
+      minPrices: newMinPrices,
+      highSym: newHighSym});
+  }
+
+  async getHistoricalData() { 
+
+    var url="https://81.150.99.19:8035/executeQuery";
+
+  
+    let queryRequest= {
+        "query": "(select lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price] by sym, time.date from trade where time.date within(.z.d-3; .z.d-1))",
         "type": "sync",
         "response": true
     };
@@ -104,8 +106,123 @@ export default class CurrentPrice extends React.Component {
     });
 
     let res = response.data.result;
-    return res;
+    
+    
+    let AAPLh=[], AIGh=[], AMDh=[], DELLh=[], DOWh=[], GOOGh=[], HPQh=[], IBMh=[], INTCh=[], MSFTh=[];
+    let newInput = {
+      date: "",
+      closePrice: 0,
+      maxPrice: 0,
+      minPrice: 0
+    }
+    let max = res.length;
+    for(let i=0; i<max; i++){
+        switch (res[i].sym){
+            case "AAPL":
+                newInput.date = res[i].date;
+                newInput.closePrice= res[i].lastp;
+                newInput.oldMaxPrice = res[i].maxp;
+                newInput.oldMinPrice = res[i].minp;
+                AAPLh.push({...newInput});
+                break;
+            case "AIG":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              AIGh.push({...newInput});
+                break;
+            case "AMD":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              AMDh.push({...newInput});
+                break;
+            case "DELL":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              DELLh.push({...newInput});
+                break;
+            case "DOW":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              DOWh.push({...newInput});
+                break;
+            case "GOOG":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              GOOGh.push({...newInput});
+                break;
+            case "HPQ":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              HPQh.push({...newInput});
+                break;
+            case "IBM":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              IBMh.push({...newInput});
+                break;
+            case "INTC":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              INTCh.push({...newInput});
+                break;
+            case "MSFT":
+              newInput.date = res[i].date;
+              newInput.closePrice= res[i].lastp;
+              newInput.oldMaxPrice = res[i].maxp;
+              newInput.oldMinPrice = res[i].minp;
+              MSFTh.push({...newInput});
+                break;
+            default:
+                break;
+        }
+    }
+    
+    let newHistory = [];
+    newHistory.push(AAPLh);
+    newHistory.push(AIGh);
+    newHistory.push(AMDh);
+    newHistory.push(DELLh);
+    newHistory.push(DOWh);
+    newHistory.push(GOOGh);
+    newHistory.push(HPQh);
+    newHistory.push(IBMh);
+    newHistory.push(INTCh);
+    newHistory.push(MSFTh);
+
+    console.log(newHistory);
+
+    //this.setState({history: newHistory});
+
+    return newHistory;
   }
+
+  async updateData(){
+    let newHistory = await this.getHistoricalData();
+    let newCurrent = await this.getCurrentData();
+
+    this.setState({currentPrices: newCurrent.currentPrices,
+      maxPrices: newCurrent.maxPrices,
+      minPrices: newCurrent.minPrices,
+      highSym: newCurrent.highSym,
+      history: newHistory});
+  }
+
 
   handleChange = (event) => {
     event.persist();
@@ -117,7 +234,7 @@ export default class CurrentPrice extends React.Component {
 
     window.setInterval(function () {
       this.updateData();
-    }.bind(this), 5000);
+    }.bind(this), 15000);
 
   }
 
@@ -131,16 +248,13 @@ export default class CurrentPrice extends React.Component {
         },
       });
 
-    function createData(sym,currentPrices, maxPrice, minPrice,) {
+    function createData(sym, currentPrice, maxPrice, minPrice, history) {
         return {
           sym,
-          currentPrices,
+          currentPrice,
           maxPrice,
           minPrice,
-          history: [
-            { date: '2020-01-05', maxPrice: '11091700', minPrice: 3,},
-            { date: '2020-01-02', maxPrice: 'Anonymous', minPrice: 1, },
-          ],
+          history,
         };
       }
 
@@ -151,16 +265,16 @@ export default class CurrentPrice extends React.Component {
 
         return (
             <React.Fragment>
-              <TableRow className={classes.root}>
+              <TableRow>
                 <TableCell>
                   <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                     {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </TableCell>
-                <TableCell component="th" scope="row">
+                <TableCell>
                   {row.sym}
                 </TableCell>
-                <TableCell align="right">{row.currentPrices}</TableCell>
+                <TableCell align="right">{row.currentPrice}</TableCell>
                 <TableCell align="right">{row.maxPrice}</TableCell>
                 <TableCell align="right">{row.minPrice}</TableCell>
               </TableRow>
@@ -175,7 +289,8 @@ export default class CurrentPrice extends React.Component {
                         <TableHead>
                           <TableRow>
                             <TableCell>Date</TableCell>
-                            <TableCell> Max Price</TableCell>
+                            <TableCell>Close Price</TableCell>
+                            <TableCell>Max Price</TableCell>
                             <TableCell>Min Price</TableCell>
                           </TableRow>
                         </TableHead>
@@ -185,8 +300,9 @@ export default class CurrentPrice extends React.Component {
                               <TableCell component="th" scope="row">
                                 {historyRow.date}
                               </TableCell>
-                              <TableCell>{historyRow.maxPrice}</TableCell>
-                              <TableCell>{historyRow.minPrice}</TableCell>
+                              <TableCell>{historyRow.closePrice}</TableCell>
+                              <TableCell>{historyRow.oldMaxPrice}</TableCell>
+                              <TableCell>{historyRow.oldMinPrice}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -203,11 +319,12 @@ export default class CurrentPrice extends React.Component {
             row: PropTypes.shape({
               maxPrice: PropTypes.number.isRequired,
               minPrice: PropTypes.number.isRequired,
-              CurrentPrice: PropTypes.number.isRequired,
+              currentPrice: PropTypes.number.isRequired,
               history: PropTypes.arrayOf(
                 PropTypes.shape({
-                  amount: PropTypes.number.isRequired,
-                  customerId: PropTypes.string.isRequired,
+                  closePrice: PropTypes.number.isRequired,
+                  oldMaxPrice: PropTypes.number.isRequired,
+                  oldMinPrice: PropTypes.number.isRequired,
                   date: PropTypes.string.isRequired,
                 }),
               ).isRequired,
@@ -215,17 +332,18 @@ export default class CurrentPrice extends React.Component {
             }).isRequired,
           };
 
+          console.log(this.state);
         const rows = [
-            createData('AAPL', 159, 6.0, 24, 4.0, 3.99),
-            createData('AIG', 237, 9.0, 37, 4.3, 4.99),
-            createData('AMD', 262, 16.0, 24, 6.0, 3.79),
-            createData('DELL', 305, 3.7, 67, 4.3, 2.5),
-            createData('DOW', 356, 16.0, 49, 3.9, 1.5),
-            createData('GOOG', 356, 16.0, 49, 3.9, 1.5),
-            createData('HPQ', 356, 16.0, 49, 3.9, 1.5),
-            createData('IBM', 356, 16.0, 49, 3.9, 1.5),
-            createData('INTC', 356, 16.0, 49, 3.9, 1.5),
-            createData('MSFT', 356, 16.0, 49, 3.9, 1.5),
+            createData('AAPL', this.state.currentPrices[0], this.state.maxPrices[0], this.state.minPrices[0], this.state.history[0]),
+            createData('AIG', this.state.currentPrices[1], this.state.maxPrices[1], this.state.minPrices[1], this.state.history[1]),
+            createData('AMD', this.state.currentPrices[2], this.state.maxPrices[2], this.state.minPrices[2], this.state.history[2]),
+            createData('DELL', this.state.currentPrices[3], this.state.maxPrices[3], this.state.minPrices[3], this.state.history[3]),
+            createData('DOW', this.state.currentPrices[4], this.state.maxPrices[4], this.state.minPrices[4], this.state.history[4]),
+            createData('GOOG', this.state.currentPrices[5], this.state.maxPrices[5], this.state.minPrices[5], this.state.history[5]),
+            createData('HPQ', this.state.currentPrices[6], this.state.maxPrices[6], this.state.minPrices[6], this.state.history[6]),
+            createData('IBM', this.state.currentPrices[7], this.state.maxPrices[7], this.state.minPrices[7], this.state.history[7]),
+            createData('INTC', this.state.currentPrices[8], this.state.maxPrices[8], this.state.minPrices[8], this.state.history[8]),
+            createData('MSFT', this.state.currentPrices[9], this.state.maxPrices[9], this.state.minPrices[9], this.state.history[9]),
         ];
     
     
