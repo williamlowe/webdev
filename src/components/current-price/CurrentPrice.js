@@ -166,51 +166,72 @@ export default class CurrentPrice extends React.Component {
     ];
 
     return (
-      <div>
-        <p>Current Trade Prices</p>
+        <div>
+          <p>Trading Prices</p>
+  
+          <span>&nbsp;&nbsp;</span>
+        <InputLabel id="time-selector">Summary data for the past three days of trading</InputLabel>
+          <Select
+            labelId="time-selector-label"
+            id="time-selector"
+            defaultValue="0"
+            onChange={this.handleChange}
+          >
+            <MenuItem value={0}>Today</MenuItem>
+            <MenuItem value={1}>2 Days</MenuItem>
+            <MenuItem value={2}>3 Days</MenuItem>
+          </Select>
+          <span>&nbsp;&nbsp;</span>
+        <span>&nbsp;&nbsp;</span>
+        <span>&nbsp;&nbsp;</span>
+  
         <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Sym</TableCell>
-            <TableCell align="right">CurrentPrices</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.CurrentPrices}</TableCell>
-              <TableCell align="right">{row.prices}</TableCell>
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Sym with highest trading price</TableCell>
+              <TableCell align="center">Sym with lowest trading price</TableCell>
+              <TableCell align="center">CurrentPrices</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-            <p></p>
-            <p></p>
-            <p></p>
-
-      <InputLabel id="time-selector">Summary data for the past three days of trading</InputLabel>
-        <Select
-          labelId="time-selector-label"
-          id="time-selector"
-          defaultValue="0"
-          onChange={this.handleChange}
-        >
-          <MenuItem value={0}>Today</MenuItem>
-          <MenuItem value={1}>2 Days</MenuItem>
-          <MenuItem value={2}>3 Days</MenuItem>
-        </Select>
-
-        <p>Sym with highest trading price:</p>
-        <p>{this.state.maxSym.sym} | {this.state.maxSym.price}</p>
-        <p>The sym with lowest trading price:</p>
-        <p>{this.state.minSym.sym} | {this.state.minSym.price}</p>
-        <p>The most traded sym is:</p>
-        <p>{this.state.highSym.sym} | {this.state.highSym.volume}</p>
-      </div>
-
-      )
+            <TableRow>
+              <TableCell align="center"> {this.state.maxSym.sym} at {this.state.maxSym.price}</TableCell>
+              <TableCell align="center">{this.state.minSym.sym} at {this.state.minSym.price}</TableCell>
+              <TableCell align="center">{this.state.highSym.sym} at {this.state.highSym.volume}</TableCell>
+            </TableRow>
+          </TableHead>
+        </Table>
+  
+        <span>&nbsp;&nbsp;</span>
+        <span>&nbsp;&nbsp;</span>
+        <span>&nbsp;&nbsp;</span>
+  
+        <p>Current Trade Prices</p>
+          <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Sym</TableCell>
+              <TableCell align="center">CurrentPrices</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.name}>
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                
+                <TableCell align="center">{row.prices}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <span>&nbsp;&nbsp;</span>
+        <span>&nbsp;&nbsp;</span>
+        <span>&nbsp;&nbsp;</span>
+  
+        
+  
+        </div>
+  
+        )
+    }
   }
-}
