@@ -25,10 +25,14 @@ export default class Timeseries extends React.Component {
         let minutes = today.getUTCMinutes();
         let cTime = Math.ceil((hours*60+minutes)/15)
 
+        let midnight = (new Date(""+today.getUTCFullYear()+" "+(today.getUTCMonth()+1)+" "+today.getUTCDate()+" UTC")).getTime();
+
         this.state = {
             //Range Indices for Slider
             rangeShort: 0,
             rangeLong: cTime,
+
+            dateNum: midnight,
 
             //String Array of Time Labels for Slider and Graph
             sliderLabels: times,
@@ -78,6 +82,7 @@ export default class Timeseries extends React.Component {
             //Default Options for Line Graph
             options: {
                 chart: {
+                  id: 'timeseries-chart',
                   height: 400,
                   type: 'line',
                   zoom: {
@@ -106,7 +111,9 @@ export default class Timeseries extends React.Component {
                   }
                 },
                 xaxis: {
-                  categories: times.slice(0, cTime+1)
+                  type: "datetime",
+                  tickAmount: 15,
+                  min: midnight,
                 },
                 tooltip: {
                   y: [
@@ -228,42 +235,64 @@ export default class Timeseries extends React.Component {
         });
         let res = response.data.result;
 
+
         //Instantiates arrays to store prices for Symbols
         let AAPLp=[], AIGp=[], AMDp=[], DELLp=[], DOWp=[], GOOGp=[], HPQp=[], IBMp=[], INTCp=[], MSFTp=[];
+        let newData = [2];
         
         //Loops Through Data and Pushes Price to the Correct Array
         let max = res.length;
         for(let i=0; i<max; i++){
             switch (res[i].sym){
                 case "AAPL":
-                    AAPLp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    AAPLp.push(newData.slice());
                     break;
                 case "AIG":
-                    AIGp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    AIGp.push(newData.slice());
                     break;
                 case "AMD":
-                    AMDp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    AMDp.push(newData.slice());
                     break;
                 case "DELL":
-                    DELLp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    DELLp.push(newData.slice());
                     break;
                 case "DOW":
-                    DOWp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    DOWp.push(newData.slice());
                     break;
                 case "GOOG":
-                    GOOGp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    GOOGp.push(newData.slice());
                     break;
                 case "HPQ":
-                    HPQp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    HPQp.push(newData.slice());
                     break;
                 case "IBM":
-                    IBMp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    IBMp.push(newData.slice());
                     break;
                 case "INTC":
-                    INTCp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    INTCp.push(newData.slice());
                     break;
                 case "MSFT":
-                    MSFTp.push(res[i].price);
+                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+                    newData[1]= res[i].price;
+                    MSFTp.push(newData.slice());
                     break;
                 default:
                     break;
@@ -315,10 +344,10 @@ export default class Timeseries extends React.Component {
 
         //Updates Options to Ensure Correct Time Range
         let newOptions = this.state.options;
-        newOptions.xaxis = this.state.sliderLabels.slice(this.state.rangeShort, this.state.rangeLong);
-
+        newOptions.xaxis.min = newSeries[0].data[0];
         //Sets the new Series and Options for Line Graph
-        this.setState({series: newSeries, options:newOptions});
+        this.setState({series: newSeries, 
+          options:newOptions});
     }
 
     //Sets Up the Component upon being Loaded
@@ -333,8 +362,14 @@ export default class Timeseries extends React.Component {
         }.bind(this), 2000);
 
     } 
+    renderGraph(props) {
+      return(
+        <Chart options={props.options} series={props.series} type="line" />
+      );
+    }
 
     render() {  
+
         //Retrieve Current Time in Hours and Minutes        
         let today = new Date();
         let hh = today.getUTCHours();
@@ -342,18 +377,23 @@ export default class Timeseries extends React.Component {
 
         //Generate Ticks for Slider
         let vals = [];
-        for(let i=0; i<Math.ceil((hh*60+mm)/15)+1; i++){
+        for(let i=0; i<Math.ceil((hh*60+mm)/15); i++){
             vals[i] = {
                 value: i
             };
         }
 
+        let graphProps = {
+          series: this.state.series,
+          options: this.state.options
+        }
+
         return (  
             <Container>
-                <Chart options={this.state.options} series={this.state.series} type="line" />
+                {this.renderGraph(graphProps)}
                 <br/>
                 <Slider
-                    defaultValue={[0, Math.ceil((hh*60+mm)/15)]}
+                    defaultValue={[0, Math.ceil((hh*60+mm)/15)-1]}
                     onChangeCommitted={this.updateRange}
                     valueLabelDisplay="on"
                     valueLabelFormat={this.getLabel}
