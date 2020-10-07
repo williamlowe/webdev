@@ -190,7 +190,7 @@ export default class CurrentPrice extends React.Component {
             <TableRow>
               <TableCell align="center">Sym with highest trading price</TableCell>
               <TableCell align="center">Sym with lowest trading price</TableCell>
-              <TableCell align="center">CurrentPrices</TableCell>
+              <TableCell align="center">Highest traded sym</TableCell>
             </TableRow>
             <TableRow>
               <TableCell align="center"> {this.state.maxSym.sym} at {this.state.maxSym.price}</TableCell>
