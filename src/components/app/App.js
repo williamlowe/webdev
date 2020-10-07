@@ -1,11 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Grid } from '@material-ui/core';
 
 import PageHeader from '../page-header/PageHeader';
-import Navbar from '../navbar/Navbar';
 import CurrentPrice from '../current-price/CurrentPrice'
 import Timeseries from '../timeseries/Timeseries'
-import ValueCache from '../value-cache/ValueCache'
 import Volatility from '../volatility/Volatility'
 
 function App() {
@@ -13,27 +11,23 @@ function App() {
     <div className="App">
       <header className="App-header">
           <PageHeader/>
-          <Router>
-            <Navbar/>
-            <Switch>  
-                <Route path="/current-price">  
-                    <div className='my-page-content'><CurrentPrice/></div>  
-                </Route>
-                <Route path="/timeseries">  
-                    <div className='my-page-content'><Timeseries/></div>  
-                </Route>  
-                <Route path="/value-cache">  
-                    <div className='my-page-content'><ValueCache/></div>  
-                </Route>  
-                <Route path="/volatility">  
-                    <div className='my-page-content'><Volatility/></div>  
-                </Route>  
-                <Route path="/">  
-                    <div className='my-page-content'><CurrentPrice/></div>  
-                </Route>  
-            </Switch>  
-          </Router>
       </header>
+      <Grid container spacing={1}>
+        <Grid item xs={5}>
+          <CurrentPrice/>
+        </Grid>
+        <Grid item xs={7}>
+          <Timeseries/>
+        </Grid>
+        <Grid item xs={12}>
+          <Volatility/>
+        </Grid>
+      </Grid>
+      
+      <br/>
+      
+      <br/>
+      
     </div>
   )
 

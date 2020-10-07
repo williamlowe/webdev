@@ -4,7 +4,6 @@ import {Typography, IconButton, Box, Collapse, Table, TableBody, TableCell, Tabl
 import axios from 'axios';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { makeStyles } from '@material-ui/core/styles';
 
 export default class CurrentPrice extends React.Component {
 
@@ -16,12 +15,11 @@ export default class CurrentPrice extends React.Component {
       { date: '2020-10-02', closePrice: 0, oldMaxPrice: 0, oldMinPrice: 0 }
     ];
     this.state = {
-      days: 0,
-
       //TableData
       currentPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       maxPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       minPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      colors: ["","","","","","","","","",""],
       highSym: {
         sym: "IBM",
         volume: 0
@@ -29,7 +27,6 @@ export default class CurrentPrice extends React.Component {
       history: [dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData]
       
     }
-    this.handleChange = this.handleChange.bind(this);
   }
 
   async getCurrentData() { 
@@ -38,7 +35,7 @@ export default class CurrentPrice extends React.Component {
 
   
     let queryRequest= {
-        "query": "(select lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price], vol:sum size by sym, time.date from trade where time.date =.z.d)",
+        "query": "(select change:.Q.f[2;last deltas distinct price], lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price], vol:sum size by sym, time.date from trade where time.date =.z.d)",
         "type": "sync",
         "response": true
     };
@@ -57,13 +54,20 @@ export default class CurrentPrice extends React.Component {
     let newTableData = response.data.result;
 
     //Extracts the Current Prices, Max, Min, and Highest Traded from Tabledata
-    let newPrices=[], newMaxPrices=[], newMinPrices=[];
+    let newPrices=[], newMaxPrices=[], newMinPrices=[], newColors=[];
     
     let newHigh = 0, newHighInd = 0;
     for(let i=0; i<10; i++){
       newPrices.push(newTableData[i].lastp);
       newMaxPrices.push(newTableData[i].maxp);
       newMinPrices.push(newTableData[i].minp);
+
+      if(newTableData[i].change < 0){
+        newColors.push("red-box");
+      }
+      else{
+        newColors.push("green-box");
+      }
       
       if(newTableData[i].vol >= newHigh){
         newHigh = newTableData[i].vol;
@@ -80,7 +84,8 @@ export default class CurrentPrice extends React.Component {
       currentPrices: newPrices,
       maxPrices: newMaxPrices,
       minPrices: newMinPrices,
-      highSym: newHighSym});
+      highSym: newHighSym,
+      colors: newColors});
   }
 
   async getHistoricalData() { 
@@ -220,14 +225,11 @@ export default class CurrentPrice extends React.Component {
       maxPrices: newCurrent.maxPrices,
       minPrices: newCurrent.minPrices,
       highSym: newCurrent.highSym,
-      history: newHistory});
+      history: newHistory,
+      colors: newCurrent.colors});
   }
 
 
-  handleChange = (event) => {
-    event.persist();
-    this.setState({days: event.target.value});
-  };
 
   async componentDidMount(){
     await this.updateData();
@@ -240,17 +242,10 @@ export default class CurrentPrice extends React.Component {
 
   render() {
 
-    const useRowStyles = makeStyles({
-        root: {
-          '& > *': {
-            borderBottom: 'unset',
-          },
-        },
-      });
-
-    function createData(sym, currentPrice, maxPrice, minPrice, history) {
+    function createData(sym, colorBox, currentPrice, maxPrice, minPrice, history) {
         return {
           sym,
+          colorBox,
           currentPrice,
           maxPrice,
           minPrice,
@@ -261,7 +256,6 @@ export default class CurrentPrice extends React.Component {
     function Row(props) {
         const { row } = props;
         const [open, setOpen] = React.useState(false);
-        const classes = useRowStyles();
 
         return (
             <React.Fragment>
@@ -271,7 +265,7 @@ export default class CurrentPrice extends React.Component {
                     {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </TableCell>
-                <TableCell>
+                <TableCell className={row.colorBox}>
                   {row.sym}
                 </TableCell>
                 <TableCell align="right">{row.currentPrice}</TableCell>
@@ -317,6 +311,7 @@ export default class CurrentPrice extends React.Component {
 
         Row.propTypes = {
             row: PropTypes.shape({
+              colorBox: PropTypes.string.isRequired,
               maxPrice: PropTypes.number.isRequired,
               minPrice: PropTypes.number.isRequired,
               currentPrice: PropTypes.number.isRequired,
@@ -334,31 +329,31 @@ export default class CurrentPrice extends React.Component {
 
           console.log(this.state);
         const rows = [
-            createData('AAPL', this.state.currentPrices[0], this.state.maxPrices[0], this.state.minPrices[0], this.state.history[0]),
-            createData('AIG', this.state.currentPrices[1], this.state.maxPrices[1], this.state.minPrices[1], this.state.history[1]),
-            createData('AMD', this.state.currentPrices[2], this.state.maxPrices[2], this.state.minPrices[2], this.state.history[2]),
-            createData('DELL', this.state.currentPrices[3], this.state.maxPrices[3], this.state.minPrices[3], this.state.history[3]),
-            createData('DOW', this.state.currentPrices[4], this.state.maxPrices[4], this.state.minPrices[4], this.state.history[4]),
-            createData('GOOG', this.state.currentPrices[5], this.state.maxPrices[5], this.state.minPrices[5], this.state.history[5]),
-            createData('HPQ', this.state.currentPrices[6], this.state.maxPrices[6], this.state.minPrices[6], this.state.history[6]),
-            createData('IBM', this.state.currentPrices[7], this.state.maxPrices[7], this.state.minPrices[7], this.state.history[7]),
-            createData('INTC', this.state.currentPrices[8], this.state.maxPrices[8], this.state.minPrices[8], this.state.history[8]),
-            createData('MSFT', this.state.currentPrices[9], this.state.maxPrices[9], this.state.minPrices[9], this.state.history[9]),
+            createData('AAPL', this.state.colors[0], this.state.currentPrices[0], this.state.maxPrices[0], this.state.minPrices[0], this.state.history[0]),
+            createData('AIG', this.state.colors[1], this.state.currentPrices[1], this.state.maxPrices[1], this.state.minPrices[1], this.state.history[1]),
+            createData('AMD', this.state.colors[2], this.state.currentPrices[2], this.state.maxPrices[2], this.state.minPrices[2], this.state.history[2]),
+            createData('DELL', this.state.colors[3], this.state.currentPrices[3], this.state.maxPrices[3], this.state.minPrices[3], this.state.history[3]),
+            createData('DOW', this.state.colors[4], this.state.currentPrices[4], this.state.maxPrices[4], this.state.minPrices[4], this.state.history[4]),
+            createData('GOOG', this.state.colors[5], this.state.currentPrices[5], this.state.maxPrices[5], this.state.minPrices[5], this.state.history[5]),
+            createData('HPQ', this.state.colors[6], this.state.currentPrices[6], this.state.maxPrices[6], this.state.minPrices[6], this.state.history[6]),
+            createData('IBM', this.state.colors[7], this.state.currentPrices[7], this.state.maxPrices[7], this.state.minPrices[7], this.state.history[7]),
+            createData('INTC', this.state.colors[8], this.state.currentPrices[8], this.state.maxPrices[8], this.state.minPrices[8], this.state.history[8]),
+            createData('MSFT', this.state.colors[9], this.state.currentPrices[9], this.state.maxPrices[9], this.state.minPrices[9], this.state.history[9]),
         ];
     
     
 
     return (
-    <div>
-    <p>Highest traded sym is {this.state.highSym.sym}</p>
-        <Table>
-        <TableHead>
+    <Box border={1} borderColor="grey.500" borderRadius={10} m={2} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
+      <h4>Current Prices</h4>
+        <Table size="small" width='450' >
+        <TableHead className='table-head'>
           <TableRow>
-            <TableCell />
-            <TableCell>Sym</TableCell>
-            <TableCell align="right">Current Price</TableCell>
-            <TableCell align="right">Max Price</TableCell>
-            <TableCell align="right">Min Price</TableCell>
+            <TableCell>History</TableCell>
+            <TableCell className='table-head-cell'>Sym</TableCell>
+            <TableCell className='table-head-cell' align="right">Current Price</TableCell>
+            <TableCell className='table-head-cell' align="right">Max Price</TableCell>
+            <TableCell className='table-head-cell' align="right">Min Price</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -367,7 +362,8 @@ export default class CurrentPrice extends React.Component {
           ))}
         </TableBody>
       </Table>
-      </div>
+      <h4>Highest Traded Today:  {this.state.highSym.sym}</h4>
+    </Box>
         )
     }
   }
