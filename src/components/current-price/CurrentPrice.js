@@ -1,6 +1,10 @@
 import * as React from 'react';  
-import { Select, MenuItem, InputLabel, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import {Typography, IconButton, Box, Collapse, Select, MenuItem, InputLabel, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import axios from 'axios';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import { makeStyles } from '@material-ui/core/styles';
 
 export default class CurrentPrice extends React.Component {
 
@@ -31,7 +35,6 @@ export default class CurrentPrice extends React.Component {
   
 
   async updateData(){
-    let newGraphData = await this.getGraphData();
     
     let newTableData = await this.getTableData();
     console.log(newTableData);
@@ -70,40 +73,12 @@ export default class CurrentPrice extends React.Component {
       volume: newTableData[newHighInd].vol
     };
 
-    this.setState({graphData: newGraphData,
+    this.setState({
       currentPrices: newPrices,
       maxSym: newMaxSym,
       minSym: newMinSym,
       highSym: newHighSym});
 
-  }
-
-  async getGraphData() { 
-    //Async/Await Query to qRest here
-    //Then put results in state's graphData
-
-    var url="https://81.150.99.19:8035/executeQuery";
-
-  //Taking prices for last price for syms for 15 min 
-    let queryRequest= {
-        "query": "(select .Q.f[3;last price] by sym, 15 xbar time.minute from trade where time.date =.z.d)",
-        "type": "sync",
-        "response": true
-    };
-
-    let response = await axios.post(url, queryRequest, {
-        headers: {
-            "Accept": "*/*",
-            "Authorization": "BASIC dXNlcjpwYXNz"
-        },
-        auth: {
-            username: 'user',
-            password: 'pass'
-        }
-    });
-
-    let res = response.data.result;
-    return res;
   }
 
   async getTableData() { 
@@ -112,7 +87,7 @@ export default class CurrentPrice extends React.Component {
 
   
     let queryRequest= {
-        "query": "(select lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price], vol:sum size by sym from trade where time.date within(`date$(.z.d-"+this.state.days+");.z.d))",
+        "query": "(select lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price], vol:sum size by sym, time.date from trade where time.date within (.z.d-2;.z.d))",
         "type": "sync",
         "response": true
     };
@@ -148,90 +123,133 @@ export default class CurrentPrice extends React.Component {
 
   render() {
 
-    function createData(name, prices) {
-      return { name, prices };
-    }
+    const useRowStyles = makeStyles({
+        root: {
+          '& > *': {
+            borderBottom: 'unset',
+          },
+        },
+      });
+
+    function createData(sym,currentPrices, maxPrice, minPrice,) {
+        return {
+          sym,
+          currentPrices,
+          maxPrice,
+          minPrice,
+          history: [
+            { date: '2020-01-05', maxPrice: '11091700', minPrice: 3,},
+            { date: '2020-01-02', maxPrice: 'Anonymous', minPrice: 1, },
+          ],
+        };
+      }
+
+    function Row(props) {
+        const { row } = props;
+        const [open, setOpen] = React.useState(false);
+        const classes = useRowStyles();
+
+        return (
+            <React.Fragment>
+              <TableRow className={classes.root}>
+                <TableCell>
+                  <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                    {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                  </IconButton>
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {row.sym}
+                </TableCell>
+                <TableCell align="right">{row.currentPrices}</TableCell>
+                <TableCell align="right">{row.maxPrice}</TableCell>
+                <TableCell align="right">{row.minPrice}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                  <Collapse in={open} timeout="auto" unmountOnExit>
+                    <Box margin={1}>
+                      <Typography variant="h6" gutterBottom component="div">
+                        History
+                      </Typography>
+                      <Table size="small" aria-label="purchases">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Date</TableCell>
+                            <TableCell> Max Price</TableCell>
+                            <TableCell>Min Price</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {row.history.map((historyRow) => (
+                            <TableRow key={historyRow.date}>
+                              <TableCell component="th" scope="row">
+                                {historyRow.date}
+                              </TableCell>
+                              <TableCell>{historyRow.maxPrice}</TableCell>
+                              <TableCell>{historyRow.minPrice}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Box>
+                  </Collapse>
+                </TableCell>
+              </TableRow>
+            </React.Fragment>
+          );
+        }
+
+        Row.propTypes = {
+            row: PropTypes.shape({
+              maxPrice: PropTypes.number.isRequired,
+              minPrice: PropTypes.number.isRequired,
+              CurrentPrice: PropTypes.number.isRequired,
+              history: PropTypes.arrayOf(
+                PropTypes.shape({
+                  amount: PropTypes.number.isRequired,
+                  customerId: PropTypes.string.isRequired,
+                  date: PropTypes.string.isRequired,
+                }),
+              ).isRequired,
+              sym: PropTypes.string.isRequired,
+            }).isRequired,
+          };
+
+        const rows = [
+            createData('AAPL', 159, 6.0, 24, 4.0, 3.99),
+            createData('AIG', 237, 9.0, 37, 4.3, 4.99),
+            createData('AMD', 262, 16.0, 24, 6.0, 3.79),
+            createData('DELL', 305, 3.7, 67, 4.3, 2.5),
+            createData('DOW', 356, 16.0, 49, 3.9, 1.5),
+            createData('GOOG', 356, 16.0, 49, 3.9, 1.5),
+            createData('HPQ', 356, 16.0, 49, 3.9, 1.5),
+            createData('IBM', 356, 16.0, 49, 3.9, 1.5),
+            createData('INTC', 356, 16.0, 49, 3.9, 1.5),
+            createData('MSFT', 356, 16.0, 49, 3.9, 1.5),
+        ];
     
-    const rows = [
-      createData('AAPL', this.state.currentPrices[0]),
-      createData('AIG', this.state.currentPrices[1]),
-      createData('AMD', this.state.currentPrices[2]),
-      createData('DELL', this.state.currentPrices[3]),
-      createData('DOW', this.state.currentPrices[4]),
-      createData('GOOG', this.state.currentPrices[5]),
-      createData('HPQ', this.state.currentPrices[6]),
-      createData('IBM', this.state.currentPrices[7]),
-      createData('INTC', this.state.currentPrices[8]),
-      createData('MSFT', this.state.currentPrices[9]),
-    ];
+    
 
     return (
-        <div>
-          <p>Trading Prices</p>
-  
-          <span>&nbsp;&nbsp;</span>
-        <InputLabel id="time-selector">Summary data for the past three days of trading</InputLabel>
-          <Select
-            labelId="time-selector-label"
-            id="time-selector"
-            defaultValue="0"
-            onChange={this.handleChange}
-          >
-            <MenuItem value={0}>Today</MenuItem>
-            <MenuItem value={1}>2 Days</MenuItem>
-            <MenuItem value={2}>3 Days</MenuItem>
-          </Select>
-          <span>&nbsp;&nbsp;</span>
-        <span>&nbsp;&nbsp;</span>
-        <span>&nbsp;&nbsp;</span>
-  
+    <div>
+    <p>Highest traded sym is {this.state.highSym.sym}</p>
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">Sym with highest trading price</TableCell>
-              <TableCell align="center">Sym with lowest trading price</TableCell>
-              <TableCell align="center">Highest traded sym</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="center"> {this.state.maxSym.sym} at {this.state.maxSym.price}</TableCell>
-              <TableCell align="center">{this.state.minSym.sym} at {this.state.minSym.price}</TableCell>
-              <TableCell align="center">{this.state.highSym.sym} at {this.state.highSym.volume}</TableCell>
-            </TableRow>
-          </TableHead>
-        </Table>
-  
-        <span>&nbsp;&nbsp;</span>
-        <span>&nbsp;&nbsp;</span>
-        <span>&nbsp;&nbsp;</span>
-  
-        <p>Current Trade Prices</p>
-          <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Sym</TableCell>
-              <TableCell align="center">Current Prices</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                
-                <TableCell align="center">{row.prices}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <span>&nbsp;&nbsp;</span>
-        <span>&nbsp;&nbsp;</span>
-        <span>&nbsp;&nbsp;</span>
-  
-        
-  
-        </div>
-  
+        <TableHead>
+          <TableRow>
+            <TableCell />
+            <TableCell>Sym</TableCell>
+            <TableCell align="right">Current Price</TableCell>
+            <TableCell align="right">Max Price</TableCell>
+            <TableCell align="right">Min Price</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <Row key={row.sym} row={row} />
+          ))}
+        </TableBody>
+      </Table>
+      </div>
         )
     }
   }
