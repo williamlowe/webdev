@@ -86,7 +86,9 @@ export default class Timeseries extends React.Component {
                   height: 400,
                   type: 'line',
                   zoom: {
-                    enabled: false
+                    type: 'x',
+                    enabled: true,
+                    autoScaleYaxis: true
                   },
                 },
                 dataLabels: {
