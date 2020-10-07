@@ -1,5 +1,5 @@
 import * as React from 'react';  
-import { Container, Slider } from '@material-ui/core';
+import { Box, Slider } from '@material-ui/core';
 import axios from 'axios';
 import Chart from 'react-apexcharts';
 
@@ -361,12 +361,12 @@ export default class Timeseries extends React.Component {
         //Sets Auto-Update Every 2 Seconds
         window.setInterval(function () {
         this.getData();
-        }.bind(this), 2000);
+        }.bind(this), 5000);
 
     } 
     renderGraph(props) {
       return(
-        <Chart options={props.options} series={props.series} type="line" />
+        <Chart options={props.options} series={props.series} type="line" height="550"/>
       );
     }
 
@@ -391,7 +391,7 @@ export default class Timeseries extends React.Component {
         }
 
         return (  
-            <Container>
+            <Box border={1} borderColor="grey.500" borderRadius={10} m={2} p={1} bgcolor="#f8f8ff" boxShadow={1}>
                 {this.renderGraph(graphProps)}
                 <br/>
                 <Slider
@@ -402,7 +402,7 @@ export default class Timeseries extends React.Component {
                     marks={vals}
                     step={null}
                 />
-            </Container>  
+            </Box>  
         )  
     }  
 }

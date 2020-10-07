@@ -4,7 +4,6 @@ import {Typography, IconButton, Box, Collapse, Table, TableBody, TableCell, Tabl
 import axios from 'axios';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { makeStyles } from '@material-ui/core/styles';
 
 export default class CurrentPrice extends React.Component {
 
@@ -243,14 +242,6 @@ export default class CurrentPrice extends React.Component {
 
   render() {
 
-    const useRowStyles = makeStyles({
-        root: {
-          '& > *': {
-            borderBottom: 'unset',
-          },
-        },
-      });
-
     function createData(sym, colorBox, currentPrice, maxPrice, minPrice, history) {
         return {
           sym,
@@ -265,7 +256,6 @@ export default class CurrentPrice extends React.Component {
     function Row(props) {
         const { row } = props;
         const [open, setOpen] = React.useState(false);
-        const classes = useRowStyles();
 
         return (
             <React.Fragment>
@@ -354,16 +344,16 @@ export default class CurrentPrice extends React.Component {
     
 
     return (
-    <div>
-    <p>Highest traded sym is {this.state.highSym.sym}</p>
-        <Table>
-        <TableHead>
+    <Box border={1} borderColor="grey.500" borderRadius={10} m={2} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
+      <h4>Current Prices</h4>
+        <Table size="small" width='450' >
+        <TableHead className='table-head'>
           <TableRow>
-            <TableCell />
-            <TableCell>Sym</TableCell>
-            <TableCell align="right">Current Price</TableCell>
-            <TableCell align="right">Max Price</TableCell>
-            <TableCell align="right">Min Price</TableCell>
+            <TableCell>History</TableCell>
+            <TableCell className='table-head-cell'>Sym</TableCell>
+            <TableCell className='table-head-cell' align="right">Current Price</TableCell>
+            <TableCell className='table-head-cell' align="right">Max Price</TableCell>
+            <TableCell className='table-head-cell' align="right">Min Price</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -372,7 +362,8 @@ export default class CurrentPrice extends React.Component {
           ))}
         </TableBody>
       </Table>
-      </div>
+      <h4>Highest Traded Today:  {this.state.highSym.sym}</h4>
+    </Box>
         )
     }
   }

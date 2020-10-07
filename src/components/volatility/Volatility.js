@@ -1,6 +1,6 @@
 import * as React from 'react';  
 import axios from 'axios';
-import { Select, MenuItem, InputLabel } from '@material-ui/core';
+import { Box, Grid, Container, Select, MenuItem, InputLabel } from '@material-ui/core';
 import Chart from 'react-apexcharts';
 
 export default class Volatility extends React.Component {
@@ -60,15 +60,15 @@ export default class Volatility extends React.Component {
         let days=0;
         let mins="15";
         let ex = this.state.extend;
-        if(ex==1){
+        if(ex===1){
             days=1;
             mins="30";
         }
-        else if(ex==2){
+        else if(ex===2){
             days=7;
             mins="60";
         }
-        else if(ex==3){
+        else if(ex===3){
             days=30;
             mins="720";
         }
@@ -246,7 +246,7 @@ export default class Volatility extends React.Component {
         //Sets Auto-Update Every 2 Seconds
         window.setInterval(function () {
         this.getData();
-        }.bind(this), 60000);
+        }.bind(this), 30000);
 
     } 
 
@@ -386,7 +386,7 @@ export default class Volatility extends React.Component {
         }
         console.log(props.series);
         return(
-          <Chart options={options} series={props.series} type="line" />
+          <Chart options={options} series={props.series} type="line" height="350"/>
         );
     }
 
@@ -396,23 +396,29 @@ export default class Volatility extends React.Component {
             extend: this.state.extend
           }
         return (  
-            <div>
-                 <span>&nbsp;&nbsp;</span>
-                <InputLabel id="time-selector">Extend Graph</InputLabel>
-                <Select
-                    labelId="time-selector-label"
-                    id="time-selector"
-                    defaultValue="0"
-                    onChange={this.handleChange}
-                >
-                    <MenuItem value={0}>Today</MenuItem>
-                    <MenuItem value={1}>Yesterday</MenuItem>
-                    <MenuItem value={2}>Last Week</MenuItem>
-                    <MenuItem value={3}>Last Month</MenuItem>
-                </Select>
-                <span>&nbsp;&nbsp;</span>
+          <Box border={1} borderColor="grey.500" borderRadius={10} m={2} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
+            <Grid container spacing={3}>
+              <Grid item xs={10}>
                 {this.renderGraph(graphProps)}
-            </div>  
+              </Grid>
+              <Grid item xs={2}>
+                  <Container>
+                    <InputLabel id="time-selector">Extend Volatility Range</InputLabel>
+                    <Select
+                        labelId="time-selector-label"
+                        id="time-selector"
+                        defaultValue="0"
+                        onChange={this.handleChange}
+                    >
+                        <MenuItem value={0}>Today</MenuItem>
+                        <MenuItem value={1}>Yesterday</MenuItem>
+                        <MenuItem value={2}>Last Week</MenuItem>
+                        <MenuItem value={3}>Last Month</MenuItem>
+                    </Select>
+                  </Container>
+              </Grid>
+            </Grid>
+          </Box>
         )  
     }  
 }

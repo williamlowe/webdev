@@ -1,9 +1,17 @@
 @import '../../variables.scss';  
 
 .green-box{
-    background-color: red;
+    background-color: #f45454;
 }
 
 .red-box{
-    background-color: green;
+    background-color: #90ee90;
+}
+
+.table-head{
+    background-color: #add8e6;
+}
+
+.table-head-cell{
+    color: white;
 }

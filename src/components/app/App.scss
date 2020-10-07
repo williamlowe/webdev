@@ -1,10 +1,11 @@
 @import '../../variables.scss'; 
 
 body { 
-    margin: 0; 
+    padding: 25px; 
     font-family: $font-family; 
+    background-color: #dcedc1;
 }
 
 .my-page-content { 
-  margin-left: $navbar-width; 
+  padding: 25px;
 }
