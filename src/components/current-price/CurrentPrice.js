@@ -209,7 +209,7 @@ export default class CurrentPrice extends React.Component {
           <TableHead>
             <TableRow>
               <TableCell>Sym</TableCell>
-              <TableCell align="center">CurrentPrices</TableCell>
+              <TableCell align="center">Current Prices</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
