@@ -204,7 +204,7 @@ export default class CurrentPrice extends React.Component {
         </Select>
 
         <p>Sym with highest trading price:</p>
-        <p>{this.state.currentPrices[0]} | {this.state.maxSym.price}</p>
+        <p>{this.state.maxSym.sym} | {this.state.maxSym.price}</p>
         <p>The sym with lowest trading price:</p>
         <p>{this.state.minSym.sym} | {this.state.minSym.price}</p>
         <p>The most traded sym is:</p>
