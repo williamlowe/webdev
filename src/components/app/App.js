@@ -13,10 +13,10 @@ function App() {
           <PageHeader/>
       </header>
       <Grid container spacing={1}>
-        <Grid item xs={5}>
+        <Grid item xs={6}>
           <CurrentPrice/>
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={6}>
           <Timeseries/>
         </Grid>
         <Grid item xs={12}>

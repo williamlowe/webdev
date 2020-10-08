@@ -283,9 +283,9 @@ export default class CurrentPrice extends React.Component {
                         <TableHead>
                           <TableRow>
                             <TableCell>Date</TableCell>
-                            <TableCell>Close Price</TableCell>
-                            <TableCell>Max Price</TableCell>
-                            <TableCell>Min Price</TableCell>
+                            <TableCell>Close Price$</TableCell>
+                            <TableCell>Max Price$</TableCell>
+                            <TableCell>Min Price$</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -351,9 +351,9 @@ export default class CurrentPrice extends React.Component {
           <TableRow>
             <TableCell>History</TableCell>
             <TableCell className='table-head-cell'>Sym</TableCell>
-            <TableCell className='table-head-cell' align="right">Current Price</TableCell>
-            <TableCell className='table-head-cell' align="right">Max Price</TableCell>
-            <TableCell className='table-head-cell' align="right">Min Price</TableCell>
+            <TableCell className='table-head-cell' align="right">Current Price$</TableCell>
+            <TableCell className='table-head-cell' align="right">Max Price$</TableCell>
+            <TableCell className='table-head-cell' align="right">Min Price$</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

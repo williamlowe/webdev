@@ -78,7 +78,7 @@ export default class Volatility extends React.Component {
 
         //Query for Gateway to be sent through qRest
         let queryRequest= {
-            "query": "(select .Q.f[3; dev price] by sym, time.date, "+mins+" xbar time.minute from trade where time.date within((.z.d-"+days+");.z.d))",
+            "query": "(select price:.Q.f[3; 100*(dev price)%(avg price)] by sym, time.date, "+mins+" xbar time.minute from trade where time.date within((.z.d-"+days+");.z.d))",
             "type": "sync",
             "response": true
         };
