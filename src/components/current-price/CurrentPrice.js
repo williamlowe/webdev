@@ -20,6 +20,7 @@ export default class CurrentPrice extends React.Component {
       maxPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       minPrices: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       colors: ["","","","","","","","","",""],
+      colorSigns: ["","","","","","","","","",""],
       highSym: {
         sym: "IBM",
         volume: 0
@@ -35,7 +36,7 @@ export default class CurrentPrice extends React.Component {
 
   
     let queryRequest= {
-        "query": "(select change:.Q.f[2;last deltas distinct price], lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price], vol:sum size by sym, time.date from trade where time.date =.z.d)",
+        "query": "(select change:.Q.f[2;last deltas price], lastp: .Q.f[2;last price], maxp: .Q.f[2;max price], minp: .Q.f[2;min price], vol:sum size by sym, time.date from trade where time.date =.z.d)",
         "type": "sync",
         "response": true
     };
@@ -54,7 +55,7 @@ export default class CurrentPrice extends React.Component {
     let newTableData = response.data.result;
 
     //Extracts the Current Prices, Max, Min, and Highest Traded from Tabledata
-    let newPrices=[], newMaxPrices=[], newMinPrices=[], newColors=[];
+    let newPrices=[], newMaxPrices=[], newMinPrices=[], newColors=[], newSigns=[];
     
     let newHigh = 0, newHighInd = 0;
     for(let i=0; i<10; i++){
@@ -64,9 +65,11 @@ export default class CurrentPrice extends React.Component {
 
       if(newTableData[i].change < 0){
         newColors.push("red-box");
+        newSigns.push("-");
       }
       else{
         newColors.push("green-box");
+        newSigns.push("+");
       }
       
       if(newTableData[i].vol >= newHigh){
@@ -85,7 +88,8 @@ export default class CurrentPrice extends React.Component {
       maxPrices: newMaxPrices,
       minPrices: newMinPrices,
       highSym: newHighSym,
-      colors: newColors});
+      colors: newColors,
+      colorSigns: newSigns});
   }
 
   async getHistoricalData() { 
@@ -94,7 +98,7 @@ export default class CurrentPrice extends React.Component {
 
   
     let queryRequest= {
-        "query": "(select lastp: .Q.f[3;last price], maxp: .Q.f[3;max price], minp: .Q.f[3;min price] by sym, time.date from trade where time.date within(.z.d-3; .z.d-1))",
+        "query": "(select lastp: .Q.f[2;last price], maxp: .Q.f[2;max price], minp: .Q.f[2;min price] by sym, time.date from trade where time.date within(.z.d-3; .z.d-1))",
         "type": "sync",
         "response": true
     };
@@ -226,7 +230,8 @@ export default class CurrentPrice extends React.Component {
       minPrices: newCurrent.minPrices,
       highSym: newCurrent.highSym,
       history: newHistory,
-      colors: newCurrent.colors});
+      colors: newCurrent.colors,
+      colorSigns: newCurrent.colorSigns});
   }
 
 
@@ -242,9 +247,10 @@ export default class CurrentPrice extends React.Component {
 
   render() {
 
-    function createData(sym, colorBox, currentPrice, maxPrice, minPrice, history) {
+    function createData(sym, sign, colorBox, currentPrice, maxPrice, minPrice, history) {
         return {
           sym,
+          sign,
           colorBox,
           currentPrice,
           maxPrice,
@@ -266,7 +272,7 @@ export default class CurrentPrice extends React.Component {
                   </IconButton>
                 </TableCell>
                 <TableCell className={row.colorBox}>
-                  {row.sym}
+                  {row.sym} {row.sign}
                 </TableCell>
                 <TableCell align="right">{row.currentPrice}</TableCell>
                 <TableCell align="right">{row.maxPrice}</TableCell>
@@ -312,6 +318,7 @@ export default class CurrentPrice extends React.Component {
         Row.propTypes = {
             row: PropTypes.shape({
               colorBox: PropTypes.string.isRequired,
+              sign: PropTypes.string.isRequired,
               maxPrice: PropTypes.number.isRequired,
               minPrice: PropTypes.number.isRequired,
               currentPrice: PropTypes.number.isRequired,
@@ -329,16 +336,16 @@ export default class CurrentPrice extends React.Component {
 
           console.log(this.state);
         const rows = [
-            createData('AAPL', this.state.colors[0], this.state.currentPrices[0], this.state.maxPrices[0], this.state.minPrices[0], this.state.history[0]),
-            createData('AIG', this.state.colors[1], this.state.currentPrices[1], this.state.maxPrices[1], this.state.minPrices[1], this.state.history[1]),
-            createData('AMD', this.state.colors[2], this.state.currentPrices[2], this.state.maxPrices[2], this.state.minPrices[2], this.state.history[2]),
-            createData('DELL', this.state.colors[3], this.state.currentPrices[3], this.state.maxPrices[3], this.state.minPrices[3], this.state.history[3]),
-            createData('DOW', this.state.colors[4], this.state.currentPrices[4], this.state.maxPrices[4], this.state.minPrices[4], this.state.history[4]),
-            createData('GOOG', this.state.colors[5], this.state.currentPrices[5], this.state.maxPrices[5], this.state.minPrices[5], this.state.history[5]),
-            createData('HPQ', this.state.colors[6], this.state.currentPrices[6], this.state.maxPrices[6], this.state.minPrices[6], this.state.history[6]),
-            createData('IBM', this.state.colors[7], this.state.currentPrices[7], this.state.maxPrices[7], this.state.minPrices[7], this.state.history[7]),
-            createData('INTC', this.state.colors[8], this.state.currentPrices[8], this.state.maxPrices[8], this.state.minPrices[8], this.state.history[8]),
-            createData('MSFT', this.state.colors[9], this.state.currentPrices[9], this.state.maxPrices[9], this.state.minPrices[9], this.state.history[9]),
+            createData('AAPL', this.state.colorSigns[0], this.state.colors[0], this.state.currentPrices[0], this.state.maxPrices[0], this.state.minPrices[0], this.state.history[0]),
+            createData('AIG', this.state.colorSigns[1], this.state.colors[1], this.state.currentPrices[1], this.state.maxPrices[1], this.state.minPrices[1], this.state.history[1]),
+            createData('AMD', this.state.colorSigns[2], this.state.colors[2], this.state.currentPrices[2], this.state.maxPrices[2], this.state.minPrices[2], this.state.history[2]),
+            createData('DELL', this.state.colorSigns[3], this.state.colors[3], this.state.currentPrices[3], this.state.maxPrices[3], this.state.minPrices[3], this.state.history[3]),
+            createData('DOW', this.state.colorSigns[4], this.state.colors[4], this.state.currentPrices[4], this.state.maxPrices[4], this.state.minPrices[4], this.state.history[4]),
+            createData('GOOG', this.state.colorSigns[5], this.state.colors[5], this.state.currentPrices[5], this.state.maxPrices[5], this.state.minPrices[5], this.state.history[5]),
+            createData('HPQ', this.state.colorSigns[6], this.state.colors[6], this.state.currentPrices[6], this.state.maxPrices[6], this.state.minPrices[6], this.state.history[6]),
+            createData('IBM', this.state.colorSigns[7], this.state.colors[7], this.state.currentPrices[7], this.state.maxPrices[7], this.state.minPrices[7], this.state.history[7]),
+            createData('INTC', this.state.colorSigns[8], this.state.colors[8], this.state.currentPrices[8], this.state.maxPrices[8], this.state.minPrices[8], this.state.history[8]),
+            createData('MSFT', this.state.colorSigns[9], this.state.colors[9], this.state.currentPrices[9], this.state.maxPrices[9], this.state.minPrices[9], this.state.history[9]),
         ];
     
     
