@@ -102,6 +102,7 @@ export default class Timeseries extends React.Component {
                   align: 'left'
                 },
                 legend: {
+                  position: "top",
                   tooltipHoverFormatter: function(val, opts) {
                     return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
                   }
