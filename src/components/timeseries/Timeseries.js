@@ -364,6 +364,17 @@ export default class Timeseries extends React.Component {
         }.bind(this), 5000);
 
     } 
+
+
+    async componentDidUpdate(prevProps, prevState){
+      if (prevState.rangeShort !== this.state.rangeShort){
+          await this.getData();
+      }
+      if (prevState.rangeLong !== this.state.rangeLong){
+        await this.getData();
+      }
+  }
+
     renderGraph(props) {
       return(
         <Chart options={props.options} series={props.series} type="line" height="550"/>
