@@ -279,11 +279,6 @@ export default class Volatility extends React.Component {
               text: 'Stock Volatility',
               align: 'left'
             },
-            legend: {
-              tooltipHoverFormatter: function(val, opts) {
-                return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
-              }
-            },
             markers: {
               size: 0,
               hover: {

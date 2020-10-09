@@ -101,12 +101,6 @@ export default class Timeseries extends React.Component {
                   text: 'Running Average Price',
                   align: 'left'
                 },
-                legend: {
-                  position: "top",
-                  tooltipHoverFormatter: function(val, opts) {
-                    return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
-                  }
-                },
                 markers: {
                   size: 0,
                   hover: {
@@ -378,7 +372,7 @@ export default class Timeseries extends React.Component {
 
     renderGraph(props) {
       return(
-        <Chart options={props.options} series={props.series} type="line" height="550"/>
+        <Chart options={props.options} series={props.series} type="line" height="525"/>
       );
     }
 

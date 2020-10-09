@@ -267,16 +267,12 @@ export default class CurrentPrice extends React.Component {
             <React.Fragment>
               <TableRow>
                 <TableCell>
-                  <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                    {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                  </IconButton>
+                  <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>{open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}</IconButton>
                 </TableCell>
-                <TableCell className={row.colorBox}>
-                  {row.sym} {row.sign}
-                </TableCell>
-                <TableCell align="right">{row.currentPrice}</TableCell>
-                <TableCell align="right">{row.maxPrice}</TableCell>
-                <TableCell align="right">{row.minPrice}</TableCell>
+                <TableCell className={row.colorBox}>{row.sym}{row.sign}</TableCell>
+                <TableCell align="right">${row.currentPrice}</TableCell>
+                <TableCell align="right">${row.maxPrice}</TableCell>
+                <TableCell align="right">${row.minPrice}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -289,9 +285,9 @@ export default class CurrentPrice extends React.Component {
                         <TableHead>
                           <TableRow>
                             <TableCell>Date</TableCell>
-                            <TableCell>Close Price$</TableCell>
-                            <TableCell>Max Price$</TableCell>
-                            <TableCell>Min Price$</TableCell>
+                            <TableCell>Close Price</TableCell>
+                            <TableCell>Max Price</TableCell>
+                            <TableCell>Min Price</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -300,9 +296,9 @@ export default class CurrentPrice extends React.Component {
                               <TableCell component="th" scope="row">
                                 {historyRow.date}
                               </TableCell>
-                              <TableCell>{historyRow.closePrice}</TableCell>
-                              <TableCell>{historyRow.oldMaxPrice}</TableCell>
-                              <TableCell>{historyRow.oldMinPrice}</TableCell>
+                              <TableCell>${historyRow.closePrice}</TableCell>
+                              <TableCell>${historyRow.oldMaxPrice}</TableCell>
+                              <TableCell>${historyRow.oldMinPrice}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -351,16 +347,16 @@ export default class CurrentPrice extends React.Component {
     
 
     return (
-    <Box border={1} borderColor="grey.500" borderRadius={10} m={2} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
-      <h4>Current Prices</h4>
+    <Box border={1} borderColor="grey.500" borderRadius={10} m={1.5} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
+      <p><strong>Current Prices</strong></p>
         <Table size="small" width='450' >
         <TableHead className='table-head'>
           <TableRow>
             <TableCell>History</TableCell>
             <TableCell className='table-head-cell'>Sym</TableCell>
-            <TableCell className='table-head-cell' align="right">Current Price$</TableCell>
-            <TableCell className='table-head-cell' align="right">Max Price$</TableCell>
-            <TableCell className='table-head-cell' align="right">Min Price$</TableCell>
+            <TableCell className='table-head-cell' align="center">Current Price</TableCell>
+            <TableCell className='table-head-cell' align="center">Max Price</TableCell>
+            <TableCell className='table-head-cell' align="center">Min Price</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
