@@ -94,8 +94,10 @@ export default class Timeseries extends React.Component {
                 dataLabels: {
                   enabled: false
                 },
+                colors: ['#680039', '#333399', '#0076b8', '#006300', '#ff0067', '#2a2a1e', '#6dff60', '#d8a400', '#993399', '#b61200'],
                 stroke: {
-                  curve: 'straight'
+                  curve: 'straight',
+                  width: 2
                 },
                 title: {
                   text: 'Running Average Price',
@@ -111,6 +113,31 @@ export default class Timeseries extends React.Component {
                   type: "datetime",
                   tickAmount: 15,
                   min: midnight,
+                  title: {
+                    text: "Time",
+                    offsetX: 0,
+                    offsetY: 4,
+                    style: {
+                        fontSize: '14px',
+                        fontFamily: 'Helvetica, Arial, sans-serif',
+                        fontWeight: 600,
+                        cssClass: 'apexcharts-xaxis-title',
+                    }
+                  }
+                },
+                yaxis: {
+                  title: {
+                    text: "Average Price",
+                    rotate: -90,
+                    offsetX: 0,
+                    offsetY: 0,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Helvetica, Arial, sans-serif',
+                        fontWeight: 600,
+                        cssClass: 'apexcharts-yaxis-title',
+                    },
+                },
                 },
                 tooltip: {
                   y: [

@@ -273,8 +273,10 @@ export default class Volatility extends React.Component {
               enabled: false
             },
             stroke: {
-              curve: 'straight'
+              curve: 'straight',
+              width: 2
             },
+            colors: ['#680039', '#333399', '#0076b8', '#006300', '#ff0067', '#2a2a1e', '#6dff60', '#d8a400', '#993399', '#b61200'],
             title: {
               text: 'Stock Volatility',
               align: 'left'
@@ -287,7 +289,32 @@ export default class Volatility extends React.Component {
             },
             xaxis: {
               type: "datetime",
-              tickAmount: 15
+              tickAmount: 15,
+              title: {
+                text: "Time",
+                offsetX: 0,
+                offsetY: 4,
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 600,
+                    cssClass: 'apexcharts-xaxis-title',
+                }
+              }
+            },
+            yaxis: {
+              title: {
+                text: "Price Volatility Percentage",
+                rotate: -90,
+                offsetX: 0,
+                offsetY: 0,
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 600,
+                    cssClass: 'apexcharts-yaxis-title',
+                },
+              }
             },
             tooltip: {
               y: [
