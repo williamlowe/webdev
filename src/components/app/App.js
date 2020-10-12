@@ -12,7 +12,7 @@ function App() {
       <header className="App-header">
           <PageHeader/>
       </header>
-      <Grid container spacing={1}>
+      <Grid container spacing={0.5}>
         <Grid item xs={5}>
           <CurrentPrice/>
         </Grid>

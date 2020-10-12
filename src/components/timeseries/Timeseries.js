@@ -37,6 +37,8 @@ export default class Timeseries extends React.Component {
             //String Array of Time Labels for Slider and Graph
             sliderLabels: times,
 
+            updatedTime: "",
+
             //Blank Data Holder for Line Graph
             series: [{
                 name: "AAPL",
@@ -137,7 +139,7 @@ export default class Timeseries extends React.Component {
                         fontWeight: 600,
                         cssClass: 'apexcharts-yaxis-title',
                     },
-                },
+                  }
                 },
                 tooltip: {
                   y: [
@@ -259,6 +261,7 @@ export default class Timeseries extends React.Component {
         });
         let res = response.data.result;
 
+        let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
         //Instantiates arrays to store prices for Symbols
         let AAPLp=[], AIGp=[], AMDp=[], DELLp=[], DOWp=[], GOOGp=[], HPQp=[], IBMp=[], INTCp=[], MSFTp=[];
@@ -371,7 +374,8 @@ export default class Timeseries extends React.Component {
         newOptions.xaxis.min = newSeries[0].data[0];
         //Sets the new Series and Options for Line Graph
         this.setState({series: newSeries, 
-          options:newOptions});
+          options: newOptions,
+          updatedTime: newTime});
     }
 
     //Sets Up the Component upon being Loaded
@@ -399,7 +403,7 @@ export default class Timeseries extends React.Component {
 
     renderGraph(props) {
       return(
-        <Chart options={props.options} series={props.series} type="line" height="525"/>
+        <Chart options={props.options} series={props.series} type="line" height="500"/>
       );
     }
 
@@ -435,6 +439,7 @@ export default class Timeseries extends React.Component {
                     marks={vals}
                     step={null}
                 />
+                <p align="right">Last Updated: {this.state.updatedTime}</p>
             </Box>  
         )  
     }  

@@ -50,6 +50,7 @@ export default class Volatility extends React.Component {
                 data: []
               }
             ],
+            updatedTime: ""
             //Default Options for Line Graph
         }  
     }   
@@ -96,6 +97,7 @@ export default class Volatility extends React.Component {
             }
         });
         let res = response.data.result;
+        let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
 
         //Instantiates arrays to store prices for Symbols
@@ -227,7 +229,8 @@ export default class Volatility extends React.Component {
         
 
         //Sets the new Series and Options for Line Graph
-        this.setState({series: newSeries});
+        this.setState({series: newSeries,
+          updatedTime: newTime});
 
 
     }
@@ -406,7 +409,6 @@ export default class Volatility extends React.Component {
         else{
             //Handle Today
         }
-        console.log(props.series);
         return(
           <Chart options={options} series={props.series} type="line" height="350"/>
         );
@@ -440,6 +442,7 @@ export default class Volatility extends React.Component {
                   </Container>
               </Grid>
             </Grid>
+            <p align="right">Last Updated: {this.state.updatedTime}</p>
           </Box>
         )  
     }  

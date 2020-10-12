@@ -25,7 +25,9 @@ export default class CurrentPrice extends React.Component {
         sym: "IBM",
         volume: 0
       },
-      history: [dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData]
+      history: [dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData,dummyData],
+
+      updatedTime: ""
       
     }
   }
@@ -53,6 +55,8 @@ export default class CurrentPrice extends React.Component {
     });
 
     let newTableData = response.data.result;
+
+    let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
     //Extracts the Current Prices, Max, Min, and Highest Traded from Tabledata
     let newPrices=[], newMaxPrices=[], newMinPrices=[], newColors=[], newSigns=[];
@@ -89,7 +93,8 @@ export default class CurrentPrice extends React.Component {
       minPrices: newMinPrices,
       highSym: newHighSym,
       colors: newColors,
-      colorSigns: newSigns});
+      colorSigns: newSigns,
+      updatedTime: newTime});
   }
 
   async getHistoricalData() { 
@@ -214,8 +219,6 @@ export default class CurrentPrice extends React.Component {
     newHistory.push(INTCh);
     newHistory.push(MSFTh);
 
-    console.log(newHistory);
-
     //this.setState({history: newHistory});
 
     return newHistory;
@@ -231,7 +234,8 @@ export default class CurrentPrice extends React.Component {
       highSym: newCurrent.highSym,
       history: newHistory,
       colors: newCurrent.colors,
-      colorSigns: newCurrent.colorSigns});
+      colorSigns: newCurrent.colorSigns,
+      updatedTime: newCurrent.updatedTime});
   }
 
 
@@ -330,7 +334,6 @@ export default class CurrentPrice extends React.Component {
             }).isRequired,
           };
 
-          console.log(this.state);
         const rows = [
             createData('AAPL', this.state.colorSigns[0], this.state.colors[0], this.state.currentPrices[0], this.state.maxPrices[0], this.state.minPrices[0], this.state.history[0]),
             createData('AIG', this.state.colorSigns[1], this.state.colors[1], this.state.currentPrices[1], this.state.maxPrices[1], this.state.minPrices[1], this.state.history[1]),
@@ -347,7 +350,7 @@ export default class CurrentPrice extends React.Component {
     
 
     return (
-    <Box border={1} borderColor="grey.500" borderRadius={10} m={1.5} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
+    <Box border={1} borderColor="grey.500" borderRadius={10} m={1.5} p={0.3} bgcolor="#f8f8ff" boxShadow={1}>
       <p><strong>Current Prices</strong></p>
         <Table size="small" width='450' >
         <TableHead className='table-head'>
@@ -365,7 +368,8 @@ export default class CurrentPrice extends React.Component {
           ))}
         </TableBody>
       </Table>
-      <h4>Highest Traded Today:  {this.state.highSym.sym}</h4>
+      <div className="table-head">Highest Traded Today:  <strong>{this.state.highSym.sym}</strong></div> 
+      <p align="right">Last Updated: {this.state.updatedTime}</p>
     </Box>
         )
     }
