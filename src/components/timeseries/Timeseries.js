@@ -40,47 +40,7 @@ export default class Timeseries extends React.Component {
             updatedTime: "",
 
             //Blank Data Holder for Line Graph
-            series: [{
-                name: "AAPL",
-                data: []
-              },
-              {
-                name: "AIG",
-                data: []
-              },
-              {
-                name: "AMD",
-                data: []
-              },
-              {
-                name: "DELL",
-                data: []
-              },
-              {
-                name: "DOW",
-                data: []
-              },
-              {
-                name: "GOOG",
-                data: []
-              },
-              {
-                name: "HPQ",
-                data: []
-              },
-              {
-                name: "IBM",
-                data: []
-              },
-              {
-                name: "INTC",
-                data: []
-              },
-              {
-                name: "MSFT",
-                data: []
-              }
-            ],
+            series: [],
             //Default Options for Line Graph
             options: {
                 chart: {
@@ -235,6 +195,16 @@ export default class Timeseries extends React.Component {
         return this.state.sliderLabels[index];
     }
 
+    checkInside(sym, arr){
+      let ind= -1;
+      for(let i=0; i<arr.length; i++){
+        if (arr[i].name === sym){
+          ind=i;
+        }
+      }
+      return ind;
+    }
+
     //Performs API call to retrieve, process, and format Line Graph Data
     async getData(){
         //URL for qRest Process on Homer
@@ -263,111 +233,33 @@ export default class Timeseries extends React.Component {
 
         let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
-        //Instantiates arrays to store prices for Symbols
-        let AAPLp=[], AIGp=[], AMDp=[], DELLp=[], DOWp=[], GOOGp=[], HPQp=[], IBMp=[], INTCp=[], MSFTp=[];
+        let newSeries=[];
+        let newSym={
+          name: "",
+          data: []
+        };
         let newData = [2];
+        let check = -1;
         
         //Loops Through Data and Pushes Price to the Correct Array
         let max = res.length;
         for(let i=0; i<max; i++){
-            switch (res[i].sym){
-                case "AAPL":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    AAPLp.push(newData.slice());
-                    break;
-                case "AIG":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    AIGp.push(newData.slice());
-                    break;
-                case "AMD":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    AMDp.push(newData.slice());
-                    break;
-                case "DELL":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    DELLp.push(newData.slice());
-                    break;
-                case "DOW":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    DOWp.push(newData.slice());
-                    break;
-                case "GOOG":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    GOOGp.push(newData.slice());
-                    break;
-                case "HPQ":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    HPQp.push(newData.slice());
-                    break;
-                case "IBM":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    IBMp.push(newData.slice());
-                    break;
-                case "INTC":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    INTCp.push(newData.slice());
-                    break;
-                case "MSFT":
-                    newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
-                    newData[1]= res[i].price;
-                    MSFTp.push(newData.slice());
-                    break;
-                default:
-                    break;
+          check = this.checkInside(res[i].sym, newSeries);
+          if(check === -1){
+            newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+            newData[1]= res[i].price;
+            newSym = {
+              name: res[i].sym,
+              data:[newData.slice()]
             }
-        }
-
-        //Formats Prices for pex Line Graph
-        let newSeries = [{
-            name: "AAPL",
-            data: AAPLp
-          },
-          {
-            name: "AIG",
-            data: AIGp
-          },
-          {
-            name: "AMD",
-            data: AMDp
-          },
-          {
-            name: "DELL",
-            data: DELLp
-          },
-          {
-            name: "DOW",
-            data: DOWp
-          },
-          {
-            name: "GOOG",
-            data: GOOGp
-          },
-          {
-            name: "HPQ",
-            data: HPQp
-          },
-          {
-            name: "IBM",
-            data: IBMp
-          },
-          {
-            name: "INTC",
-            data: INTCp
-          },
-          {
-            name: "MSFT",
-            data: MSFTp
+            newSeries.push({...newSym});
           }
-        ];
+          else{
+            newData[0]= this.state.dateNum+(res[i].minute.i * 60000);
+            newData[1]= res[i].price;
+            newSeries[check].data.push(newData.slice());
+          }
+        }
 
         //Updates Options to Ensure Correct Time Range
         let newOptions = this.state.options;

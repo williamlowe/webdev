@@ -9,52 +9,21 @@ export default class Volatility extends React.Component {
     
         this.state = {  
             extend: 0,
-            series: [{
-                name: "AAPL",
-                data: []
-              },
-              {
-                name: "AIG",
-                data: []
-              },
-              {
-                name: "AMD",
-                data: []
-              },
-              {
-                name: "DELL",
-                data: []
-              },
-              {
-                name: "DOW",
-                data: []
-              },
-              {
-                name: "GOOG",
-                data: []
-              },
-              {
-                name: "HPQ",
-                data: []
-              },
-              {
-                name: "IBM",
-                data: []
-              },
-              {
-                name: "INTC",
-                data: []
-              },
-              {
-                name: "MSFT",
-                data: []
-              }
-            ],
+            series: [],
             updatedTime: ""
             //Default Options for Line Graph
         }  
     }   
 
+    checkInside(sym, arr){
+      let ind= -1;
+      for(let i=0; i<arr.length; i++){
+        if (arr[i].name === sym){
+          ind=i;
+        }
+      }
+      return ind;
+    }
 
      //Performs API call to retrieve, process, and format Line Graph Data
      async getData(){
@@ -99,69 +68,34 @@ export default class Volatility extends React.Component {
         let res = response.data.result;
         let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
-
-        //Instantiates arrays to store prices for Symbols
-        let AAPLp=[], AIGp=[], AMDp=[], DELLp=[], DOWp=[], GOOGp=[], HPQp=[], IBMp=[], INTCp=[], MSFTp=[];
-        let newPoint = [2];
         
         //Loops Through Data and Pushes Price to the Correct Array
         let max = res.length;
 
+        let newSeries=[];
+        let newSym={
+          name: "",
+          data: []
+        };
+        let newData = [2];
+        let check = -1;
+
         for(let i=0; i<max; i++){
-            switch (res[i].sym){
-                case "AAPL":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    AAPLp.push(newPoint.slice());
-                    break;
-                case "AIG":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    AIGp.push(newPoint.slice());
-                    break;
-                case "AMD":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    AMDp.push(newPoint.slice());
-                    break;
-                case "DELL":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    DELLp.push(newPoint.slice());
-                    break;
-                case "DOW":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    DOWp.push(newPoint.slice());
-                    break;
-                case "GOOG":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    GOOGp.push(newPoint.slice());
-                    break;
-                case "HPQ":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    HPQp.push(newPoint.slice());
-                    break;
-                case "IBM":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    IBMp.push(newPoint.slice());
-                    break;
-                case "INTC":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    INTCp.push(newPoint.slice());
-                    break;
-                case "MSFT":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    MSFTp.push(newPoint.slice());
-                    break;
-                default:
-                    break;
+          check = this.checkInside(res[i].sym, newSeries);
+          if(check === -1){
+            newData[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
+            newData[1]= res[i].price;
+            newSym = {
+              name: res[i].sym,
+              data:[newData.slice()]
             }
+            newSeries.push({...newSym});
+          }
+          else{
+            newData[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
+            newData[1]= res[i].price;
+            newSeries[check].data.push(newData.slice());
+          }
         }
 
         function sortFunction(a, b) {
@@ -172,60 +106,10 @@ export default class Volatility extends React.Component {
                 return (a[0] < b[0]) ? -1 : 1;
             }
         }
-        AAPLp.sort(sortFunction);
-        AIGp.sort(sortFunction);
-        AMDp.sort(sortFunction);
-        DELLp.sort(sortFunction);
-        DOWp.sort(sortFunction);
-        GOOGp.sort(sortFunction);
-        HPQp.sort(sortFunction);
-        IBMp.sort(sortFunction);
-        INTCp.sort(sortFunction);
-        MSFTp.sort(sortFunction);
 
-        
-        //Formats Prices for pex Line Graph
-        let newSeries = [{
-            name: "AAPL",
-            data: AAPLp
-          },
-          {
-            name: "AIG",
-            data: AIGp
-          },
-          {
-            name: "AMD",
-            data: AMDp
-          },
-          {
-            name: "DELL",
-            data: DELLp
-          },
-          {
-            name: "DOW",
-            data: DOWp
-          },
-          {
-            name: "GOOG",
-            data: GOOGp
-          },
-          {
-            name: "HPQ",
-            data: HPQp
-          },
-          {
-            name: "IBM",
-            data: IBMp
-          },
-          {
-            name: "INTC",
-            data: INTCp
-          },
-          {
-            name: "MSFT",
-            data: MSFTp
-          }
-        ];
+        for(let i=0; i<newSeries.length; i++){
+          newSeries[i].data.sort(sortFunction);
+        }
         
 
         //Sets the new Series and Options for Line Graph
