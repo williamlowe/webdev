@@ -1,6 +1,6 @@
 import * as React from 'react';  
 import axios from 'axios';
-import { Box, Grid, Container, Select, MenuItem, InputLabel } from '@material-ui/core';
+import { Box, Grid, Container, Select, MenuItem, InputLabel, FormControl } from '@material-ui/core';
 import Chart from 'react-apexcharts';
 
 export default class Volatility extends React.Component {
@@ -9,51 +9,21 @@ export default class Volatility extends React.Component {
     
         this.state = {  
             extend: 0,
-            series: [{
-                name: "AAPL",
-                data: []
-              },
-              {
-                name: "AIG",
-                data: []
-              },
-              {
-                name: "AMD",
-                data: []
-              },
-              {
-                name: "DELL",
-                data: []
-              },
-              {
-                name: "DOW",
-                data: []
-              },
-              {
-                name: "GOOG",
-                data: []
-              },
-              {
-                name: "HPQ",
-                data: []
-              },
-              {
-                name: "IBM",
-                data: []
-              },
-              {
-                name: "INTC",
-                data: []
-              },
-              {
-                name: "MSFT",
-                data: []
-              }
-            ],
+            series: [],
+            updatedTime: ""
             //Default Options for Line Graph
         }  
     }   
 
+    checkInside(sym, arr){
+      let ind= -1;
+      for(let i=0; i<arr.length; i++){
+        if (arr[i].name === sym){
+          ind=i;
+        }
+      }
+      return ind;
+    }
 
      //Performs API call to retrieve, process, and format Line Graph Data
      async getData(){
@@ -96,70 +66,36 @@ export default class Volatility extends React.Component {
             }
         });
         let res = response.data.result;
+        let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
-
-        //Instantiates arrays to store prices for Symbols
-        let AAPLp=[], AIGp=[], AMDp=[], DELLp=[], DOWp=[], GOOGp=[], HPQp=[], IBMp=[], INTCp=[], MSFTp=[];
-        let newPoint = [2];
         
         //Loops Through Data and Pushes Price to the Correct Array
         let max = res.length;
 
+        let newSeries=[];
+        let newSym={
+          name: "",
+          data: []
+        };
+        let newData = [2];
+        let check = -1;
+
         for(let i=0; i<max; i++){
-            switch (res[i].sym){
-                case "AAPL":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    AAPLp.push(newPoint.slice());
-                    break;
-                case "AIG":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    AIGp.push(newPoint.slice());
-                    break;
-                case "AMD":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    AMDp.push(newPoint.slice());
-                    break;
-                case "DELL":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    DELLp.push(newPoint.slice());
-                    break;
-                case "DOW":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    DOWp.push(newPoint.slice());
-                    break;
-                case "GOOG":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    GOOGp.push(newPoint.slice());
-                    break;
-                case "HPQ":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    HPQp.push(newPoint.slice());
-                    break;
-                case "IBM":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    IBMp.push(newPoint.slice());
-                    break;
-                case "INTC":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    INTCp.push(newPoint.slice());
-                    break;
-                case "MSFT":
-                    newPoint[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
-                    newPoint[1]= res[i].price;
-                    MSFTp.push(newPoint.slice());
-                    break;
-                default:
-                    break;
+          check = this.checkInside(res[i].sym, newSeries);
+          if(check === -1){
+            newData[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
+            newData[1]= res[i].price;
+            newSym = {
+              name: res[i].sym,
+              data:[newData.slice()]
             }
+            newSeries.push({...newSym});
+          }
+          else{
+            newData[0]= (new Date(""+res[i].date.substring(0,4)+" "+res[i].date.substring(5,7) + " " + res[i].date.substring(8) +" UTC")).getTime()+(res[i].minute.i * 60000);
+            newData[1]= res[i].price;
+            newSeries[check].data.push(newData.slice());
+          }
         }
 
         function sortFunction(a, b) {
@@ -170,64 +106,15 @@ export default class Volatility extends React.Component {
                 return (a[0] < b[0]) ? -1 : 1;
             }
         }
-        AAPLp.sort(sortFunction);
-        AIGp.sort(sortFunction);
-        AMDp.sort(sortFunction);
-        DELLp.sort(sortFunction);
-        DOWp.sort(sortFunction);
-        GOOGp.sort(sortFunction);
-        HPQp.sort(sortFunction);
-        IBMp.sort(sortFunction);
-        INTCp.sort(sortFunction);
-        MSFTp.sort(sortFunction);
 
-        
-        //Formats Prices for pex Line Graph
-        let newSeries = [{
-            name: "AAPL",
-            data: AAPLp
-          },
-          {
-            name: "AIG",
-            data: AIGp
-          },
-          {
-            name: "AMD",
-            data: AMDp
-          },
-          {
-            name: "DELL",
-            data: DELLp
-          },
-          {
-            name: "DOW",
-            data: DOWp
-          },
-          {
-            name: "GOOG",
-            data: GOOGp
-          },
-          {
-            name: "HPQ",
-            data: HPQp
-          },
-          {
-            name: "IBM",
-            data: IBMp
-          },
-          {
-            name: "INTC",
-            data: INTCp
-          },
-          {
-            name: "MSFT",
-            data: MSFTp
-          }
-        ];
+        for(let i=0; i<newSeries.length; i++){
+          newSeries[i].data.sort(sortFunction);
+        }
         
 
         //Sets the new Series and Options for Line Graph
-        this.setState({series: newSeries});
+        this.setState({series: newSeries,
+          updatedTime: newTime});
 
 
     }
@@ -273,16 +160,13 @@ export default class Volatility extends React.Component {
               enabled: false
             },
             stroke: {
-              curve: 'straight'
+              curve: 'straight',
+              width: 2
             },
+            colors: ['#680039', '#333399', '#0076b8', '#006300', '#ff0067', '#2a2a1e', '#6dff60', '#d8a400', '#993399', '#b61200'],
             title: {
               text: 'Stock Volatility',
               align: 'left'
-            },
-            legend: {
-              tooltipHoverFormatter: function(val, opts) {
-                return val + ' - ' + opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] + ''
-              }
             },
             markers: {
               size: 0,
@@ -292,7 +176,32 @@ export default class Volatility extends React.Component {
             },
             xaxis: {
               type: "datetime",
-              tickAmount: 15
+              tickAmount: 15,
+              title: {
+                text: "Time",
+                offsetX: 0,
+                offsetY: 4,
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 600,
+                    cssClass: 'apexcharts-xaxis-title',
+                }
+              }
+            },
+            yaxis: {
+              title: {
+                text: "Price Volatility Percentage",
+                rotate: -90,
+                offsetX: 0,
+                offsetY: 0,
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 600,
+                    cssClass: 'apexcharts-yaxis-title',
+                },
+              }
             },
             tooltip: {
               y: [
@@ -384,7 +293,6 @@ export default class Volatility extends React.Component {
         else{
             //Handle Today
         }
-        console.log(props.series);
         return(
           <Chart options={options} series={props.series} type="line" height="350"/>
         );
@@ -397,17 +305,20 @@ export default class Volatility extends React.Component {
           }
         return (  
           <Box border={1} borderColor="grey.500" borderRadius={10} m={2} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
-            <Grid container spacing={3}>
-              <Grid item xs={10}>
+            
+            <Grid item xs={12}>
                 {this.renderGraph(graphProps)}
               </Grid>
-              <Grid item xs={2}>
+            <Grid container spacing={3}>              
+              <Grid item xs={3}>
                   <Container>
-                    <InputLabel id="time-selector">Extend Volatility Range</InputLabel>
+                  <FormControl variant="filled" fullWidth="true">
+                    <InputLabel id="time-selector-label">Volatility Range</InputLabel>
                     <Select
+                        autoWidth="true"
                         labelId="time-selector-label"
                         id="time-selector"
-                        defaultValue="0"
+                        defaultValue=""
                         onChange={this.handleChange}
                     >
                         <MenuItem value={0}>Today</MenuItem>
@@ -415,9 +326,12 @@ export default class Volatility extends React.Component {
                         <MenuItem value={2}>Last Week</MenuItem>
                         <MenuItem value={3}>Last Month</MenuItem>
                     </Select>
+                  </FormControl>
                   </Container>
               </Grid>
+              <Grid item xs={9}><p align="right">Last Updated: {this.state.updatedTime}</p></Grid>
             </Grid>
+            
           </Box>
         )  
     }  
