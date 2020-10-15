@@ -1,6 +1,6 @@
 import * as React from 'react';  
 import axios from 'axios';
-import { Box, Grid, Container, Select, MenuItem, InputLabel } from '@material-ui/core';
+import { Box, Grid, Container, Select, MenuItem, InputLabel, FormControl } from '@material-ui/core';
 import Chart from 'react-apexcharts';
 
 export default class Volatility extends React.Component {
@@ -305,17 +305,20 @@ export default class Volatility extends React.Component {
           }
         return (  
           <Box border={1} borderColor="grey.500" borderRadius={10} m={2} p={0.5} bgcolor="#f8f8ff" boxShadow={1}>
-            <Grid container spacing={3}>
-              <Grid item xs={10}>
+            
+            <Grid item xs={12}>
                 {this.renderGraph(graphProps)}
               </Grid>
-              <Grid item xs={2}>
+            <Grid container spacing={3}>              
+              <Grid item xs={3}>
                   <Container>
-                    <InputLabel id="time-selector">Extend Volatility Range</InputLabel>
+                  <FormControl variant="filled" fullWidth="true">
+                    <InputLabel id="time-selector-label">Volatility Range</InputLabel>
                     <Select
+                        autoWidth="true"
                         labelId="time-selector-label"
                         id="time-selector"
-                        defaultValue="0"
+                        defaultValue=""
                         onChange={this.handleChange}
                     >
                         <MenuItem value={0}>Today</MenuItem>
@@ -323,10 +326,12 @@ export default class Volatility extends React.Component {
                         <MenuItem value={2}>Last Week</MenuItem>
                         <MenuItem value={3}>Last Month</MenuItem>
                     </Select>
+                  </FormControl>
                   </Container>
               </Grid>
+              <Grid item xs={9}><p align="right">Last Updated: {this.state.updatedTime}</p></Grid>
             </Grid>
-            <p align="right">Last Updated: {this.state.updatedTime}</p>
+            
           </Box>
         )  
     }  

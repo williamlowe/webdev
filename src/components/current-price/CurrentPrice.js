@@ -1,6 +1,6 @@
 import * as React from 'react';  
 import PropTypes from 'prop-types';
-import {Typography, IconButton, Box, Collapse, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import {Typography, IconButton, Box, Collapse, Table, TableBody, TableCell, TableHead, TableRow, Grid } from '@material-ui/core';
 import axios from 'axios';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
@@ -315,8 +315,12 @@ export default class CurrentPrice extends React.Component {
           ))}
         </TableBody>
       </Table>
-      <div className="table-head">Highest Traded Today:  <strong>{this.state.highSym.sym}</strong></div> 
-      <p align="right">Last Updated: {this.state.updatedTime}</p>
+      <Grid container spacing={0}>              
+        <Grid item xs={7}>
+        <p className="table-head">Highest Traded Today:  <strong>{this.state.highSym.sym}</strong></p>
+        </Grid>
+        <Grid item xs={5}><p align="right">Last Updated: {this.state.updatedTime}</p></Grid>
+      </Grid>      
     </Box>
         )
     }

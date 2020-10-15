@@ -295,7 +295,7 @@ export default class Timeseries extends React.Component {
 
     renderGraph(props) {
       return(
-        <Chart options={props.options} series={props.series} type="line" height="500"/>
+        <Chart options={props.options} series={props.series} type="line" height="450"/>
       );
     }
 
