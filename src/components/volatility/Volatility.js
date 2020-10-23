@@ -15,6 +15,7 @@ export default class Volatility extends React.Component {
         }  
     }   
 
+    //Checks to See if a Symbol already has data or if it's the first instance
     checkInside(sym, arr){
       let ind= -1;
       for(let i=0; i<arr.length; i++){
@@ -29,6 +30,8 @@ export default class Volatility extends React.Component {
      async getData(){
         let days=0;
         let mins="15";
+
+        //Sets the Bounds for the Possible Ranges i.e. today, yesterday, last week, or last month
         let ex = this.state.extend;
         if(ex===1){
             days=1;
@@ -80,6 +83,7 @@ export default class Volatility extends React.Component {
         let newData = [2];
         let check = -1;
 
+        //Loops Through Data Points and Pushes them to correct array or instantiates a new Object for a new Symbol
         for(let i=0; i<max; i++){
           check = this.checkInside(res[i].sym, newSeries);
           if(check === -1){
@@ -98,6 +102,7 @@ export default class Volatility extends React.Component {
           }
         }
 
+        //Function to Sort the Data by Date/Time
         function sortFunction(a, b) {
             if (a[0] === b[0]) {
                 return 0;
@@ -119,6 +124,7 @@ export default class Volatility extends React.Component {
 
     }
 
+    //Handles a new setting for the Volatility Range drop-down menu
     handleChange = (event) => {
         event.persist();
         this.setState({extend: event.target.value});
@@ -137,6 +143,8 @@ export default class Volatility extends React.Component {
 
     } 
 
+
+    //Runs to Make Sure New Data is Populated when a new Range is Selected
     async componentDidUpdate(prevProps, prevState){
         if (prevState.extend !== this.state.extend){
             await this.getData();
@@ -144,6 +152,7 @@ export default class Volatility extends React.Component {
     }
 
 
+    //Renders the Apex Line Graph
     renderGraph(props) {
         let options= {
             chart: {
@@ -281,24 +290,13 @@ export default class Volatility extends React.Component {
               borderColor: '#f1f1f1',
             }
         }
-        if(props.extend===1){
-            //Handle Yesterday
-        }
-        else if(props.extend===2){
-            //Handle Last Week
-        }
-        else if(props.extend===3){
-            //Handle Last Month
-        }
-        else{
-            //Handle Today
-        }
         return(
           <Chart options={options} series={props.series} type="line" height="350"/>
         );
     }
 
     render() {  
+        //Props for renderGraph function call
         let graphProps = {
             series: this.state.series,
             extend: this.state.extend

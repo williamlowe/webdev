@@ -9,34 +9,55 @@ export default class CurrentPrice extends React.Component {
 
   constructor(props){
     super(props)
+    //Uses Arrays of Equal Length for Table Columns
     this.state = {
-      //TableData
+      //Strings of Sym names
       syms: [],
+
+      //Latest Price on Each Symbol
       currentPrices: [],
+      
+      //Daily Highest Price for Each Sym
       maxPrices: [],
+
+      //Daily Lowest Price for Each Sym
       minPrices: [],
+
+      //CSS classes for green/red boxes for prices going up or down
       colors: [],
+
+      //'+' or '-' for each sym to show direction
       colorSigns: [],
+
+      //Sym with the Highest Volume of Trades Today
       highSym: {
         sym: "",
         volume: 0
       },
-      history: []
+
+      //An Array for Each Sym's Historical Data
+      history: [],
+
+      //Time of Latest Update
+      updatedTime: ""
       
     }
   }
 
+  //Queries and Handles the Daily Data for Each Sym in the Table
   async getCurrentData() { 
 
+    //qRest Process URL
     var url="https://81.150.99.19:8013/executeQuery";
 
-  
+    //Body of qRest Post Call
     let queryRequest= {
         "query": "(select change:.Q.f[2;last deltas price], lastp: .Q.f[2;last price], maxp: .Q.f[2;max price], minp: .Q.f[2;min price], vol:sum size by sym, time.date from trade where time.date =.z.d)",
         "type": "sync",
         "response": true
     };
 
+    //Sends a Post Request to qRest
     let response = await axios.post(url, queryRequest, {
         headers: {
             "Accept": "*/*",
@@ -52,18 +73,22 @@ export default class CurrentPrice extends React.Component {
 
     console.log(newTableData);
 
+    //Most Reent Update Time
     let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
-    //Extracts the Current Prices, Max, Min, and Highest Traded from Tabledata
+    
     let newSyms=[], newPrices=[], newMaxPrices=[], newMinPrices=[], newColors=[], newSigns=[];
     
     let newHigh = 0, newHighInd = 0;
+
+    //Loops through response and Extracts the Current Prices, Maxs, Mins, and Highest Traded from Tabledata
     for(let i=0; i<newTableData.length; i++){
       newSyms.push(newTableData[i].sym);
       newPrices.push(newTableData[i].lastp);
       newMaxPrices.push(newTableData[i].maxp);
       newMinPrices.push(newTableData[i].minp);
 
+      //Determines if Price has gone Up or Down
       if(newTableData[i].change < 0){
         newColors.push("red-box");
         newSigns.push("-");
@@ -84,6 +109,7 @@ export default class CurrentPrice extends React.Component {
       volume: newTableData[newHighInd].vol
     };
 
+    //Returns an Object containing values for New State
     return({
       syms: newSyms,
       currentPrices: newPrices,
@@ -95,6 +121,7 @@ export default class CurrentPrice extends React.Component {
       updatedTime: newTime});
   }
 
+  //Checks If Symbol is already in the Array
   checkInside(sym, arr){
     let ind= -1;
     for(let i=0; i<arr.length; i++){
@@ -105,8 +132,10 @@ export default class CurrentPrice extends React.Component {
     return ind;
   }
 
+  //Retrieves Historical Data for Table
   async getHistoricalData() { 
 
+    //qRest Process URL
     var url="https://81.150.99.19:8013/executeQuery";
 
   
@@ -142,6 +171,8 @@ export default class CurrentPrice extends React.Component {
       data: []
     };
     let max = res.length;
+
+    //Loops Through and creates historical datta array for each sym
     for(let i=0; i<max; i++){
       check= this.checkInside(res[i].sym, sortedInfo);
       if(check === -1){
@@ -177,6 +208,7 @@ export default class CurrentPrice extends React.Component {
     return newHistory;
   }
 
+  //Function to Update Both Daily and Historical Table Data in One Go
   async updateData(){
     let newHistory = await this.getHistoricalData();
     let newCurrent = await this.getCurrentData();
@@ -193,8 +225,7 @@ export default class CurrentPrice extends React.Component {
       updatedTime: newCurrent.updatedTime});
   }
 
-
-
+  //Populates Initial Data to Page and Sets Timer for Periodic Update
   async componentDidMount(){
     await this.updateData();
 
@@ -206,6 +237,7 @@ export default class CurrentPrice extends React.Component {
 
   render() {
 
+    //Used to Format Data for Each Row in the Table
     function createData(sym, sign, colorBox, currentPrice, maxPrice, minPrice, history) {
         return {
           sym,
@@ -218,6 +250,7 @@ export default class CurrentPrice extends React.Component {
         };
       }
 
+      //Row Component of Material-UI Table
     function Row(props) {
         const { row } = props;
         const [open, setOpen] = React.useState(false);
@@ -269,7 +302,7 @@ export default class CurrentPrice extends React.Component {
             </React.Fragment>
           );
         }
-
+        //Strict Properties Required for Each Row Component
         Row.propTypes = {
             row: PropTypes.shape({
               colorBox: PropTypes.string.isRequired,

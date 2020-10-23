@@ -25,6 +25,7 @@ export default class Timeseries extends React.Component {
         let minutes = today.getUTCMinutes();
         let cTime = Math.ceil((hours*60+minutes)/15)
 
+        //Sets the minimum for the time range
         let midnight = (new Date(""+today.getUTCFullYear()+" "+(today.getUTCMonth()+1)+" "+today.getUTCDate()+" UTC")).getTime();
 
         this.state = {
@@ -37,6 +38,7 @@ export default class Timeseries extends React.Component {
             //String Array of Time Labels for Slider and Graph
             sliderLabels: times,
 
+            //Time the Latest data was Received
             updatedTime: "",
 
             //Blank Data Holder for Line Graph
@@ -101,6 +103,7 @@ export default class Timeseries extends React.Component {
                     },
                   }
                 },
+                //Line Graph Hover Menu
                 tooltip: {
                   y: [
                     {
@@ -195,6 +198,7 @@ export default class Timeseries extends React.Component {
         return this.state.sliderLabels[index];
     }
 
+    //Checks to See if Symbol is Already in Array of Symbols
     checkInside(sym, arr){
       let ind= -1;
       for(let i=0; i<arr.length; i++){
@@ -231,6 +235,7 @@ export default class Timeseries extends React.Component {
         });
         let res = response.data.result;
 
+        //Grabs the New Update Time
         let newTime = response.data.responseTime.substring(11, 19) + " UTC";
 
         let newSeries=[];
@@ -283,7 +288,7 @@ export default class Timeseries extends React.Component {
 
     } 
 
-
+    //Runs on Moving the Slider to Re-Query for the correct info
     async componentDidUpdate(prevProps, prevState){
       if (prevState.rangeShort !== this.state.rangeShort){
           await this.getData();
@@ -293,6 +298,7 @@ export default class Timeseries extends React.Component {
       }
   }
 
+    //Renders the Apex Line Graph
     renderGraph(props) {
       return(
         <Chart options={props.options} series={props.series} type="line" height="450"/>
@@ -314,6 +320,7 @@ export default class Timeseries extends React.Component {
             };
         }
 
+        //Object to Pass to renderGraph function
         let graphProps = {
           series: this.state.series,
           options: this.state.options
