@@ -208,7 +208,7 @@ export default class Timeseries extends React.Component {
     //Performs API call to retrieve, process, and format Line Graph Data
     async getData(){
         //URL for qRest Process on Homer
-        var url="https://81.150.99.19:8035/executeQuery";
+        var url="https://81.150.99.19:8013/executeQuery";
 
         //Query for Gateway to be sent through qRest
         let queryRequest= {

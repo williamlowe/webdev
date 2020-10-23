@@ -44,7 +44,7 @@ export default class Volatility extends React.Component {
         }
 
         //URL for qRest Process on Homer
-        var url="https://81.150.99.19:8035/executeQuery";
+        var url="https://81.150.99.19:8013/executeQuery";
 
         //Query for Gateway to be sent through qRest
         let queryRequest= {

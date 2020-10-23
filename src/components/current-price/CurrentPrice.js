@@ -28,7 +28,7 @@ export default class CurrentPrice extends React.Component {
 
   async getCurrentData() { 
 
-    var url="https://81.150.99.19:8035/executeQuery";
+    var url="https://81.150.99.19:8013/executeQuery";
 
   
     let queryRequest= {
@@ -107,7 +107,7 @@ export default class CurrentPrice extends React.Component {
 
   async getHistoricalData() { 
 
-    var url="https://81.150.99.19:8035/executeQuery";
+    var url="https://81.150.99.19:8013/executeQuery";
 
   
     let queryRequest= {
